@@ -6,9 +6,14 @@
 
 /* in app.js i'm exporting two objects, when declaring the variable, 
 i need to put the brackets to define the object that i want to use */
-const {app} = require('../app');
+const app = require('../app');
 const debug = require('debug')('local-library:server');
 const http = require('http');
+
+// database packages
+const mysql = require('mysql');
+const mysql2 = require('mysql2');
+const Sequelize = require('sequelize');
 
 /**
  * Get port from environment and store in Express.
@@ -16,6 +21,19 @@ const http = require('http');
 
 const port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
+
+// orm configuration
+const sequelize = new Sequelize('locallibrary', 'root', 'V01d3m0rt', {
+  host: 'localhost',
+  dialect: 'mysql'
+});
+
+try {
+  async function test () {await sequelize.authenticate();}
+  console.log('Connection has been established successfully.');
+} catch (error) {
+  console.error('Unable to connect to the database:', error);
+}
 
 /**
  * Create HTTP server.

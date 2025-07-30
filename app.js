@@ -14,19 +14,6 @@ const usersRouter = require('./routes/users');
 
 const app = express();
 
-// orm configuration
-const sequelize = new Sequelize('locallibrary', 'root', 'V01d3m0rt', {
-  host: 'localhost',
-  dialect: 'mysql'
-});
-
-try {
-  async function test () {await sequelize.authenticate();}
-  console.log('Connection has been established successfully.');
-} catch (error) {
-  console.error('Unable to connect to the database:', error);
-}
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -56,4 +43,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = {app, sequelize};
+module.exports = app;
