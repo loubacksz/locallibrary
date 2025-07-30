@@ -25,21 +25,3 @@ const Author = database.define('Author', {
 });
 
 module.exports = Author;
-
-
-
-
-function outer(){
-
-    const message = "Hello";
-
-    function inner(){
-        console.log(message);
-    }
-
-    inner();
-}
-
-message = "Goodbye";
-
-outer();

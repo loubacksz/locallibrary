@@ -15,7 +15,7 @@ const usersRouter = require('./routes/users');
 const app = express();
 
 // orm configuration
-const sequelize = new Sequelize('localtest', 'root', 'V01d3m0rt', {
+const sequelize = new Sequelize('locallibrary', 'root', 'V01d3m0rt', {
   host: 'localhost',
   dialect: 'mysql'
 });
