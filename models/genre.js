@@ -1,10 +1,8 @@
 const { DataTypes } = require('sequelize');
 const database = require('../bin/www');
-//const Book = require('./book');
-//const GenreBook = require('./genrebook');
 
 const Genre = database.define('genre',{
-    genreId:{
+    id:{
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
@@ -23,9 +21,3 @@ const Genre = database.define('genre',{
 });
 
 module.exports = Genre;
-/*
-database.sync({alter: true});
-
-Genre.belongsToMany(Book, {through: GenreBook});
-Book.belongsToMany(Genre, {through: GenreBook});
-*/

@@ -3,8 +3,8 @@ const database = require('../bin/www')
 const Book = require('./book');
 const Genre = require('./genre');
 
-const GenreBook = database.define('genrebook', {
-    genreBookId: {
+const GenreBook = database.define('genrebooks', {
+    id: {
         primaryKey: true,
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -13,16 +13,19 @@ const GenreBook = database.define('genrebook', {
         type: DataTypes.INTEGER,
         references: {
             model: Genre,
-            key: 'genreId'
+            key: 'id',
         }
     },
     bookId: {
         type: DataTypes.INTEGER,
         references: {
             model: Book,
-            key: 'bookId'
+            key: 'id',
         }
-    }
+    },
+}, {
+    timestamps: false,
+    freezeTableName: true
 });
 
 module.exports = GenreBook;

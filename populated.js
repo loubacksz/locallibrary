@@ -75,7 +75,19 @@ async function dropTest() {
 // ASSOCIATION - ONE TO MANY
 // COMBINATION OF: hasMany() and belongsTo()
 
-database.sync({force: true});
+database.sync({alter: true});
+
+Genre.belongsToMany(Book, {
+    through: GenreBook, 
+    onDelete: 'CASCADE', 
+    onUpdate: 'CASCADE'
+});
+
+Book.belongsToMany(Genre, {
+    through: GenreBook, 
+    onDelete: 'CASCADE', 
+    onUpdate: 'CASCADE'
+});
 
 Author.hasMany(Book, {
     foreignKey: {
@@ -84,9 +96,6 @@ Author.hasMany(Book, {
     }
 });
 Book.belongsTo(Author);
-
-Genre.belongsToMany(Book, {through: GenreBook});
-Book.belongsToMany(Genre, {through: GenreBook});
 
 
 
