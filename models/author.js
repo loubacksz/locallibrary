@@ -1,14 +1,16 @@
-const {Sequelize, DataTypes} = require('sequelize');
+const { DataTypes } = require('sequelize');
+const database = require('../bin/www');
 
-// database = sequelize from /app - it's the connection with the database
-const database = require('../app');
+/* 
+database = sequelize variable from /bin/www.js - it's the connection with the database
+the sequelize variable stores the Sequelize object that create the connection with the db
+*/
 
-const Author = database.define('Author', {
+const Author = database.define('author', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
+        primaryKey: true,
     },
     first_name: { 
         type: DataTypes.STRING(100),
@@ -20,8 +22,10 @@ const Author = database.define('Author', {
         allowNull: false, 
     },
     date_of_birth: DataTypes.DATEONLY,
-    date_of_death: DataTypes.DATEONLY ,
-
+    date_of_death: DataTypes.DATEONLY
+}, {
+    timestamps: false,
+    freezeTableName: true
 });
 
 module.exports = Author;

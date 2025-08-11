@@ -4,11 +4,6 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-// database packages
-const mysql = require('mysql');
-const mysql2 = require('mysql2');
-const Sequelize = require('sequelize');
-
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
