@@ -5,6 +5,7 @@ const Author = require('./models/author');
 const Book = require('./models/book');
 const Genre = require('./models/genre');
 const GenreBook = require('./models/genrebook');
+const BookInstance = require('./models/bookinstance');
 
 async function testModelAuthor(){
     try {
@@ -96,6 +97,14 @@ Author.hasMany(Book, {
     }
 });
 Book.belongsTo(Author);
+
+Book.hasMany(BookInstance, {
+    foreignKey: {
+        name: 'bookId',
+        allowNull: false
+    }
+});
+BookInstance.belongsTo(Book);
 
 
 
