@@ -35,8 +35,6 @@ const modelAssociations = async function modelAssociations() {
         onUpdate: 'CASCADE'
     });
 
-    await database.sync({ alter: true });
-
 }
 
 module.exports = modelAssociations;
