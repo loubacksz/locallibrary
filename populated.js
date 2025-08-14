@@ -8,31 +8,29 @@ const associations = require('./models/associations')
 
 async function testModels(){
     try {
-        await database.sync({ drop: false });
-        await associations();
-        console.log("------------------------------------------");
+        await associations(); //it's necessary to call the associations before making CRUD
+        
+        //await database.sync({ force: true }); - no need to sync every time, this will only change the tables
 
-        const author = await Author.create({
-            first_name: 'J.K',
-            family_name: 'Rolling',
+        const genre = await Genre.create({
+            name: 'Fantasy',
         });
 
         console.log("------------------------------------------");
 
-        console.log(author.id);
+        console.log(genre.id);
 
         console.log("------------------------------------------");
 
-        const book = await Book.create({
-            title: 'Harry Potter',
-            summary: 'Wiches and Wizards',
-            isbn: '563-1-34-148410-6',
-            authorId: 2
+        const bookinstance = await BookInstance.create({
+            bookId: 1,
+            imprint: 'Random Books',
+            dueBack: new Date(),
         });
 
         console.log("------------------------------------------");
 
-        console.log(book.id);
+        console.log(bookinstance.id);
 
         console.log("------------------------------------------");
 

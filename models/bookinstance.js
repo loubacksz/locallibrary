@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const database = require('../bin/www');
-const Book = require('./book');
 
 const BookInstance = database.define('bookinstance', {
     id: {
@@ -19,8 +18,7 @@ const BookInstance = database.define('bookinstance', {
         defaultValue: 'Maintenance'
     },
     dueBack: {
-        type: DataTypes.STRING,
-        defaultValue: DataTypes.DATEONLY
+        type: DataTypes.DATEONLY,
     }
 }, {
     timestamps: false,

@@ -5,6 +5,8 @@ const Genre = require('./genre');
 const GenreBook = require('./genrebook');
 const BookInstance = require('./bookinstance');
 
+// a problem with this file is that i can't call for only one association 
+
 const modelAssociations = async function modelAssociations() {
 
     Author.hasMany(Book, {
