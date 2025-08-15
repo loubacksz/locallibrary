@@ -1,6 +1,9 @@
 const { DataTypes } = require('sequelize');
 const database = require('../bin/www');
 
+//I have to use ENUM here, although it appears on the documentation
+//that it can only be used with Postgres, that's not true  
+
 const BookInstance = database.define('bookinstance', {
     id: {
         primaryKey: true,
@@ -12,9 +15,8 @@ const BookInstance = database.define('bookinstance', {
         allowNull: false
     },
     status: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM(['Available', 'Maintenance', 'Loaned', 'Reserved']),
         allowNull: false,
-        enum: ["Available", "Maintenance", "Loaned", "Reserved"],
         defaultValue: 'Maintenance'
     },
     dueBack: {

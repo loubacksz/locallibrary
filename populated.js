@@ -10,9 +10,9 @@ async function testModels(){
     try {
         await associations(); //it's necessary to call the associations before making CRUD
         
-        //await database.sync({ force: true }); - no need to sync every time, this will only change the tables
+        //await database.sync(); - no need to sync every time, this will only change the tables
 
-        const genre = await Genre.create({
+        /*const genre = await Genre.create({
             name: 'Fantasy',
         });
 
@@ -20,12 +20,13 @@ async function testModels(){
 
         console.log(genre.id);
 
-        console.log("------------------------------------------");
+        console.log("------------------------------------------");*/
 
         const bookinstance = await BookInstance.create({
-            bookId: 1,
-            imprint: 'Random Books',
+            bookId: 2,
+            imprint: 'Naughty Books',
             dueBack: new Date(),
+            status: 'Available'
         });
 
         console.log("------------------------------------------");
