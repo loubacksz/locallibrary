@@ -1,3 +1,4 @@
+/*
 const database = require('./bin/www');
 const Author = require('./models/author');
 const Book = require('./models/book');
@@ -12,26 +13,14 @@ async function testModels(){
         
         //await database.sync(); - no need to sync every time, this will only change the tables
 
-        /*const genre = await Genre.create({
-            name: 'Fantasy',
+        const genrebook = await GenreBook.create({
+            genreId: 1,
+            bookId: 1
         });
 
         console.log("------------------------------------------");
 
-        console.log(genre.id);
-
-        console.log("------------------------------------------");*/
-
-        const bookinstance = await BookInstance.create({
-            bookId: 2,
-            imprint: 'Naughty Books',
-            dueBack: new Date(),
-            status: 'Available'
-        });
-
-        console.log("------------------------------------------");
-
-        console.log(bookinstance.id);
+        console.log(genrebook.id);
 
         console.log("------------------------------------------");
 
@@ -42,7 +31,7 @@ async function testModels(){
 }
 
 testModels();
-
+*/
 
 
 

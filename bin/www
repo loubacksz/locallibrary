@@ -22,7 +22,10 @@ const Sequelize = require('sequelize');
 const port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
 
-// orm configuration
+/**
+ * ORM setup
+ */
+
 const sequelize = new Sequelize('locallibrary', 'root', 'V01d3m0rt', {
   host: 'localhost',
   dialect: 'mysql'

@@ -1,3 +1,4 @@
+/*
 const { DataTypes } = require('sequelize');
 const database = require('./bin/www');
 
@@ -37,3 +38,4 @@ async function testEnum(){
 }
 
 testEnum();
+*/
