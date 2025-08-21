@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
-const database = require('../bin/www');
+//const database = require('../bin/www');
+const database = require('../db/dbConnection');
 
 //I have to use ENUM here, although it appears on the documentation
 //that it can only be used with Postgres, that's not true  

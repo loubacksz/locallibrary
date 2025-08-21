@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const database = require('../bin/www');
+const database = require('../db/dbConnection');
 
 /* 
 database = sequelize variable from /bin/www.js - it's the connection with the database

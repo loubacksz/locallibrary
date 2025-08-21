@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
-const database = require('../bin/www')
+//const database = require('../bin/www');
+const database = require('../db/dbConnection');
 const Book = require('./book');
 const Genre = require('./genre');
 
