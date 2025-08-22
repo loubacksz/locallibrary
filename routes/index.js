@@ -12,8 +12,13 @@ const router = express.Router();
 // next() - when invoked, executes the middleware succeding the current one 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', function(req, res) {
+
+  // This redirects to the specified page, by default sending HTTP status code "302 Found". 
+  // You can change the status code returned if needed, and supply either absolute or relative paths
+
+  res.redirect('/catalog');
+
 });
 
 module.exports = router;

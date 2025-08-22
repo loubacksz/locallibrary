@@ -10,11 +10,6 @@ const app = require('../app');
 const debug = require('debug')('local-library:server');
 const http = require('http');
 
-// database packages
-const mysql = require('mysql');
-const mysql2 = require('mysql2');
-const Sequelize = require('sequelize');
-
 /**
  * Get port from environment and store in Express.
  */
@@ -26,17 +21,23 @@ app.set('port', port);
  * ORM setup
  */
 
+
+/*
 const sequelize = new Sequelize('locallibrary', 'root', 'V01d3m0rt', {
   host: 'localhost',
   dialect: 'mysql'
 });
 
+async function dbAuthentication() {await sequelize.authenticate();}
+
 try {
-  async function test () {await sequelize.authenticate();}
+  dbAuthentication();
   console.log('Connection has been established successfully.');
 } catch (error) {
   console.error('Unable to connect to the database:', error);
 }
+*/
+
 
 /**
  * Create HTTP server.
@@ -112,4 +113,4 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-module.exports = sequelize;
+//module.exports = sequelize;
