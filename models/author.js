@@ -21,6 +21,12 @@ const Author = database.define('author', {
         type: DataTypes.STRING(100), 
         allowNull: false, 
     },
+    url: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return `/catalog/author/${this._id}`;
+        }
+    },
     date_of_birth: DataTypes.DATEONLY,
     date_of_death: DataTypes.DATEONLY
 }, {

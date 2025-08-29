@@ -15,7 +15,12 @@ const Genre = database.define('genre',{
             len: [3,100]
         }
     },
-
+    url: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return `/catalog/genre/${this._id}`;
+        }
+    }
 }, {
     timestamps: false,
     freezeTableName: true,

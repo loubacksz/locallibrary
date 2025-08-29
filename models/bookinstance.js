@@ -22,6 +22,12 @@ const BookInstance = database.define('bookinstance', {
     },
     dueBack: {
         type: DataTypes.DATEONLY,
+    },
+    url: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return `/catalog/bookinstance/${this._id}`;
+        }
     }
 }, {
     timestamps: false,
