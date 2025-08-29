@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-//const database = require('../bin/www');
 const database = require('../db/dbConnection');
 
 const Book = database.define('book', {
@@ -20,6 +19,12 @@ const Book = database.define('book', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    url: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return `/catalog/book/${this._id}`;
+        }
+    }
 }, {
     timestamps: false,
     freezeTableName: true

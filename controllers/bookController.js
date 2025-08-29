@@ -47,7 +47,7 @@ exports.book_list = async (req, res, next) => {
                     model: Author,
                     attributes: ['first_name', 'family_name']
                 },
-                attributes: ['title'],
+                attributes: ['title', 'url'],
                 order: [['title', 'ASC']],
             }
         );
