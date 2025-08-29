@@ -40,6 +40,7 @@ exports.index = async (req, res, next) => {
 exports.book_list = async (req, res, next) => {
     try{
         await associations();
+
         const allBooks = await Book.findAll(
             {
                 include: {
@@ -52,7 +53,7 @@ exports.book_list = async (req, res, next) => {
         );
 
         let string = JSON.stringify(allBooks, null, 2);
-        
+
         let json = JSON.parse(string);
 
         res.render("book_list", { title: "Book List", book_list: json });
