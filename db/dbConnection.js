@@ -3,11 +3,11 @@
 // I changed the file extension and some errors started to show up, then I decided to move the db connection to another file
 // It worked proprerly
 
-const app = require('../app');
+// const app = require('../app'); -> idk why, but this fucker was responsible for TypeError: database.define is not a function
 
 // database packages
 const mysql = require('mysql');
-const Sequelize = require('sequelize');
+const { Sequelize } = require('sequelize');
 
 /**
  * ORM setup
@@ -18,13 +18,15 @@ const sequelize = new Sequelize('locallibrary', 'root', 'V01d3m0rt', {
     dialect: 'mysql'
 });
 
-async function dbAuthentication() { await sequelize.authenticate(); }
-
-try {
-    dbAuthentication();
-    console.log('Connection has been established successfully.');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
+async function dbAuthentication() {
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+    } catch (error) {
+        console.error('Unable to connect to the database: ', error);
+    }
 }
+
+dbAuthentication();
 
 module.exports = sequelize;
