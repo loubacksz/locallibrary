@@ -1,13 +1,40 @@
 // now we are creating the controllers! 
 
 // first we need to import the modules - we'll later be using to access and update our data
+const Book = require('../models/book');
+const Author = require("../models/author");
+const Genre = require("../models/genre");
 const BookInstance = require("../models/bookinstance");
+const associations = require('../models/associations');
 
 // then exports functions for each of the URLs we wish to handle
 
 // Display list of all BookInstances.
 exports.bookinstance_list = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: BookInstance list");
+    try{
+        await associations();
+        const allBookInstances = await BookInstance.findAll({
+            include: {
+                model: Book,
+                attributes: ['title'],
+            },
+            attributes: {
+                include:[['dueBack', 'due_back']]
+            }
+        });
+
+        let string = JSON.stringify(allBookInstances);
+
+        let json = JSON.parse(string);
+
+        res.render(
+            "bookinstance_list", {
+            title: "Book Instance List",
+            bookinstance_list: json,
+        });
+    } catch(err){
+        console.log('debbug: ' + err);
+    }
 };
 
 // Display detail page for a specific BookInstance.
