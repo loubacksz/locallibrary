@@ -11,24 +11,14 @@ async function testModels(){
         await associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); - no need to sync every time, this will only change the tables
 
-        // list of all book copies
-        // title of the Book associated with each BookInstance(linked with its detail page) 
-        // status, imprint, id of each copy
-        // the unique id text should be linked to the BookInstance detail page
+        // list of all authors
+        // with each author name linked to its associated author detail page
+        // date of birth and date of death should be listed after the name on the same line
 
-        const bookInstance = await BookInstance.findAll({
-            include: {
-                model: Book,
-                attributes: ['title'],
-            },
-            attributes: {
-                include:[['dueBack', 'due_back']]
-            }
-        });
-
+        const author = await Author.findAll();
         console.log("------------------------------------------");
         
-        let text = JSON.stringify(bookInstance);
+        let text = JSON.stringify(author);
         let json = JSON.parse(text);
         console.log(json);
 
