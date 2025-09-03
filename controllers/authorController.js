@@ -1,13 +1,19 @@
 // now we are creating the controllers! 
 
 // first we need to import the modules - we'll later be using to access and update our data
-const Author = require('../models/author');
+const Book = require('../models/book');
+const Author = require("../models/author");
+const Genre = require("../models/genre");
+const BookInstance = require("../models/bookinstance");
+const associations = require('../models/associations');
 
 // then exports functions for each of the URLs we wish to handle
 
 // Display list of all Authors.
 exports.author_list = async (req, res, next) => {
     try {
+        await associations();
+
         const allAuthors = await Author.findAll();
     
         res.render('author_list', {

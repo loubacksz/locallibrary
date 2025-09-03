@@ -51,13 +51,11 @@ exports.book_list = async (req, res, next) => {
                 order: [['title', 'ASC']],
             }
         );
-
         let string = JSON.stringify(allBooks, null, 2);
-
         let json = JSON.parse(string);
 
         res.render("book_list", { title: "Book List", book_list: json });
-    } catch (err) {
+    } catch (err){
         console.log('debbug: ' + err);
     }
 };

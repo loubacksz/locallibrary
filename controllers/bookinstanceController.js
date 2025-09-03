@@ -13,6 +13,7 @@ const associations = require('../models/associations');
 exports.bookinstance_list = async (req, res, next) => {
     try{
         await associations();
+
         const allBookInstances = await BookInstance.findAll({
             include: {
                 model: Book,
@@ -22,9 +23,7 @@ exports.bookinstance_list = async (req, res, next) => {
                 include:[['dueBack', 'due_back']]
             }
         });
-
         let string = JSON.stringify(allBookInstances);
-
         let json = JSON.parse(string);
 
         res.render(

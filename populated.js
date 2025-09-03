@@ -11,14 +11,16 @@ async function testModels(){
         await associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); - no need to sync every time, this will only change the tables
 
-        // list of all authors
-        // with each author name linked to its associated author detail page
-        // date of birth and date of death should be listed after the name on the same line
+        // list of all genres
+        // sort the results by name, in ascending order.
 
-        const author = await Author.findAll();
+        const genre = await Genre.findAll({
+            order: [['name', 'ASC']]
+        });
+        
         console.log("------------------------------------------");
         
-        let text = JSON.stringify(author);
+        let text = JSON.stringify(genre);
         let json = JSON.parse(text);
         console.log(json);
 
