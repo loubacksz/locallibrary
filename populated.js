@@ -9,13 +9,17 @@ const associations = require('./models/associations');
 async function testModels(){
     try {
         await associations(); //it's necessary to call the associations before making CRUD
-        //await database.sync({alter: {drop: false}}); - no need to sync every time, this will only change the tables
+        // await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
 
-        // list of all genres
-        // sort the results by name, in ascending order.
+        // accessing a specific genre
+        // it should list all books that belong to the accessed genre
+        // also show each book summary
 
-        const genre = await Genre.findAll({
-            order: [['name', 'ASC']]
+        const genre = await Genre.findByPk(1, {
+            include: {
+                model: Book,
+            },
+            order: [['name', 'ASC'], [Book, 'title', 'ASC']]
         });
         
         console.log("------------------------------------------");

@@ -21,7 +21,7 @@ exports.genre_list = async (req, res, next) => {
         const json = JSON.parse(text);
 
         res.render('genre_list', {
-            title: "Author List",
+            title: "Genre List",
             genre_list: json,
         });
     } catch(err){
@@ -31,7 +31,27 @@ exports.genre_list = async (req, res, next) => {
 
 // Display detail page for a specific Genre
 exports.genre_detail = async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: Genre detail: ${req.params.id}`);
+    try{
+        await associations();
+
+        const genre = await Genre.findByPk(req.params.id, {
+            include: {
+                model: Book,
+            },
+            order: [['name', 'ASC'], [Book, 'title', 'ASC']]
+        });
+        const text = JSON.stringify(genre);
+        const json = JSON.parse(text);
+        
+        res.render('genre_detail', {
+            title: 'Genre Detail',
+            json,
+            genre_books: json.books
+        });
+    } catch(err){
+        console.log('debbug: ' + err);
+    }
+
 };
 
 // Display Genre create form on GET

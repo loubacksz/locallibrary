@@ -17,7 +17,7 @@ const Genre = database.define('genre',{
     url: {
         type: DataTypes.VIRTUAL,
         get() {
-            return `/catalog/genre/${this._id}`;
+            return `/catalog/genre/${this.id}`;
         }
     }
 }, {
