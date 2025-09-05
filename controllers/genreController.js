@@ -42,6 +42,12 @@ exports.genre_detail = async (req, res, next) => {
         });
         const text = JSON.stringify(genre);
         const json = JSON.parse(text);
+
+        if(json === null) {
+            const error = new Error('Genre not found');
+            error.status = 404;
+            return next(error);
+        }
         
         res.render('genre_detail', {
             title: 'Genre Detail',
