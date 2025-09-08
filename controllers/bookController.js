@@ -47,14 +47,15 @@ exports.book_list = async (req, res, next) => {
                     model: Author,
                     attributes: ['first_name', 'family_name']
                 },
-                attributes: ['title', 'url'],
+                attributes: ['id','title', 'url'],
                 order: [['title', 'ASC']],
             }
         );
-        let string = JSON.stringify(allBooks, null, 2);
-        let json = JSON.parse(string);
+        const string = JSON.stringify(allBooks, null, 2);
+        const book = JSON.parse(string);
+        console.log(book);
 
-        res.render("book_list", { title: "Book List", book_list: json });
+        res.render("book_list", { title: "Book List", book_list: book });
     } catch (err){
         console.log('debbug: ' + err);
     }
@@ -62,7 +63,42 @@ exports.book_list = async (req, res, next) => {
 
 // Display detail page for a specific book
 exports.book_detail = async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: Book detail: ${req.params.id}`)
+    try{
+        await associations();
+
+        const bookDetail = await Book.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Author,
+                    attributes: ['first_name', 'family_name', 'url']
+                },
+                {
+                    model: Genre,
+                },
+                {
+                    model: BookInstance,
+                    attributes: {include: [['dueBack', 'due_back']]}
+                }
+            ],
+            order: [['title', 'ASC']],
+        });
+        const book_text = JSON.stringify(bookDetail);
+        const book = JSON.parse(book_text);
+
+        if(book === null) {
+            const error = new Error('Book not found');
+            error.status = 404;
+            return next(error);
+        }
+
+        res.render('book_detail', {
+            book,
+            book_instances: book.bookinstances
+        });
+    } catch(err){ 
+        console.log('debbug: ' + err)
+    }
+
 };
 
 // Display book create form on GET

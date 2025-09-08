@@ -11,22 +11,36 @@ async function testModels(){
         await associations(); //it's necessary to call the associations before making CRUD
         // await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
 
-        // accessing a specific genre
-        // it should list all books that belong to the accessed genre
-        // also show each book summary
+        // accessing a specific book -> findByPk()
+        // book name
+        // book author
+        // book summary
+        // book isbn
+        // list ALL instances of a book and its properties -> findAll()
+            // need to find WHERE Book model 'book.id' = BookInstance model 'bookinstance.bookId'
 
-        const genre = await Genre.findByPk(1, {
-            include: {
-                model: Book,
-            },
-            order: [['name', 'ASC'], [Book, 'title', 'ASC']]
+        const bookDetail = await Book.findByPk(1, {
+            include: [
+                {
+                    model: Author,
+                    attributes: ['first_name', 'family_name', 'url']
+                },
+                {
+                    model: Genre,
+                },
+                {
+                    model: BookInstance,
+                    attributes: {include: [['dueBack', 'due_back']]}
+                }
+            ],
+            order: [['title', 'ASC']],
         });
         
         console.log("------------------------------------------");
         
-        let text = JSON.stringify(genre);
-        let json = JSON.parse(text);
-        console.log(json);
+        const text1 = JSON.stringify(bookDetail);
+        const json1 = JSON.parse(text1);
+        console.log(json1);
 
         console.log("------------------------------------------");
 
@@ -35,7 +49,7 @@ async function testModels(){
         console.log("------------------------------------------");
     }
     catch (error) {
-        console.error('Test failed:', error);
+        console.error('debbug: ', error);
     }
 }
 
