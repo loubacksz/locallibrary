@@ -22,7 +22,7 @@ const Book = database.define('book', {
     url: {
         type: DataTypes.VIRTUAL,
         get() {
-            return `/catalog/book/${this._id}`;
+            return `/catalog/book/${this.id}`;
         }
     }
 }, {

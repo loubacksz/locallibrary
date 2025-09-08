@@ -26,7 +26,7 @@ const BookInstance = database.define('bookinstance', {
     url: {
         type: DataTypes.VIRTUAL,
         get() {
-            return `/catalog/bookinstance/${this._id}`;
+            return `/catalog/bookinstance/${this.id}`;
         }
     },
     due_back_formatted: {
