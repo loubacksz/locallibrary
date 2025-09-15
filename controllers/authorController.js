@@ -27,7 +27,33 @@ exports.author_list = async (req, res, next) => {
 
 // Display detail page for a specific Author.
 exports.author_detail = async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: Author detail: ${req.params.id}`);
+    try{
+        await associations();
+        
+        const authorDetail = await Author.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Book,
+                },
+            ],
+            order: [['first_name', 'ASC']],
+        });
+        const txt = JSON.stringify(authorDetail);
+        const author = JSON.parse(txt);
+
+        if(author === null){
+            const error = new Error('Author not found');
+            error.status = 404;
+            return next(error);
+        }
+
+        res.render('author_detail',{
+            author,
+            author_books: author.books
+        });
+    } catch(err){
+        console.log('debbug: ' + err);
+    }
 };
 
 // Display Auhtor create form on GET.
