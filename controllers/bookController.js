@@ -53,7 +53,6 @@ exports.book_list = async (req, res, next) => {
         );
         const string = JSON.stringify(allBooks, null, 2);
         const book = JSON.parse(string);
-        console.log(book);
 
         res.render("book_list", { title: "Book List", book_list: book });
     } catch (err){
@@ -70,7 +69,7 @@ exports.book_detail = async (req, res, next) => {
             include: [
                 {
                     model: Author,
-                    attributes: ['first_name', 'family_name', 'url']
+                    attributes: ['id', 'first_name', 'family_name', 'url']
                 },
                 {
                     model: Genre,
