@@ -21,7 +21,8 @@ exports.bookinstance_list = async (req, res, next) => {
             },
             attributes: {
                 include:[['dueBack', 'due_back']]
-            }
+            },
+            order: [[Book, 'title', 'ASC']]
         });
         let string = JSON.stringify(allBookInstances);
         let json = JSON.parse(string);
@@ -38,7 +39,31 @@ exports.bookinstance_list = async (req, res, next) => {
 
 // Display detail page for a specific BookInstance.
 exports.bookinstance_detail = async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: BookInstance detail: ${req.params.id}`);
+    try {
+        await associations();
+
+        const bookInstanceDetail = await BookInstance.findByPk(req.params.id, {
+            include: {
+                model: Book,
+                attributes: ['id', 'title', 'url']
+            },
+            attributes: { exclude: ['bookId'] },
+        });
+        const text = JSON.stringify(bookInstanceDetail);
+        const bookinstance = JSON.parse(text);
+
+        if(bookinstance === null){
+            const error = new Error('Book Instance not found!');
+            error.status = 404;
+            return error.status;
+        }
+
+        res.render('bookinstance_detail', {
+            bookinstance
+        });
+    } catch (err) {
+        console.log('debbug: ' + err);
+    }
 };
 
 // Display BookInstance create form on GET.

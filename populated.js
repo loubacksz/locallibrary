@@ -11,26 +11,24 @@ async function testModels(){
         await associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
 
-        // accessing a specific author -> findByPk()
-        // author name
-        // author date_of_birth
-        // author date_of_death
-        // author books
-        // list ALL author books and its properties -> findAll()
-            // need to find WHERE Author model 'author.id' = Book model 'book.id'
+        // accessing a specific book instance -> findByPk()
+        // book instance id
+        // book instance due back
+        // book instance imprint
+        // book instance status
+        // book title
 
-        const bookDetail = await Author.findByPk(1, {
-            include: [
-                {
-                    model: Book,
-                },
-            ],
-            order: [['first_name', 'ASC']],
+        const bookInstanceDetail = await BookInstance.findByPk(1, {
+            include: {
+                model: Book,
+                attributes: ['id', 'title', 'url']
+            },
+            attributes: { exclude: ['bookId'] },
         });
         
         console.log("------------------------------------------");
         
-        const text1 = JSON.stringify(bookDetail);
+        const text1 = JSON.stringify(bookInstanceDetail);
         const json1 = JSON.parse(text1);
         console.log(json1);
 
