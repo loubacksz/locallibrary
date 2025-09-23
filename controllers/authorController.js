@@ -7,6 +7,9 @@ const Genre = require("../models/genre");
 const BookInstance = require("../models/bookinstance");
 const associations = require('../models/associations');
 
+// importing 'express-validator' for validation and sanitization
+const { body, validationResult } = require('express-validator');
+
 // then exports functions for each of the URLs we wish to handle
 
 // Display list of all Authors.
@@ -58,13 +61,75 @@ exports.author_detail = async (req, res, next) => {
 
 // Display Auhtor create form on GET.
 exports.author_create_get = async (req, res, next) => { 
-    res.send("NOT IMPLEMENTED: Author create GET");
+    res.render("author_form", {title: "Create Author"});
 };
 
 // Handle Author create on POST
-exports.author_create_post = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Author create POST");
-};
+exports.author_create_post = [
+    //import the 'express-validator' functions - destructured
+    
+    // validation and sanitization - each field has it own validation/sanitization
+    body('first_name', "Test")
+        .trim()
+        .isLength({ min: 1 })
+        .escape()
+        .withMessage("First name must be specified."),
+    body('family_name', "Name must use letters")
+        .trim()
+        .isLength({ min: 1 })
+        .escape()
+        .withMessage("Family name must be specified."),
+    body("date_of_birth", "Invalid date of birth")
+        .optional({ values: "falsy" })
+        .isISO8601()
+        .toDate(),
+    body("date_of_death", "Invalid date of death")
+        .optional({ values: "falsy" })
+        .isISO8601()
+        .toDate(),
+    
+    // process the request after v and s
+    async (req, res, next) => {
+        try{
+            // extract validation errors from a request
+            const errors = validationResult(req);
+
+            // what if I don't have a date_of_birth
+            if(req.body.date_of_birth === ''){
+                req.body.date_of_birth = null;
+            }
+            
+            // what if I don't have a date_of_death
+            if(req.body.date_of_death === ''){
+                req.body.date_of_death = null;
+            }
+    
+            // create author object with escaped and trimmed data - use 'build' instead of 'create' - build does not persist when its called
+            const author = Author.build({
+                first_name: req.body.first_name,
+                family_name: req.body.family_name,
+                date_of_birth: req.body.date_of_birth,
+                date_of_death: req.body.date_of_death
+            });
+    
+            // check errors
+                // if true - send to author.url with errors message
+                // if false - save it to db and send to author.url
+            if(!errors.isEmpty()){
+                res.render("author_form", {
+                    title: "Create Author",
+                    errors: errors.array() // returns a list of all errors from all validated fields
+                });
+                return;
+            }
+    
+            await author.save();
+            res.redirect(author.url);
+        } catch(err){
+            console.log('debug: ' + err);
+        }
+    }
+];
 
 // Display Author delete form on GET
 exports.author_delete_get = async (req, res, next) => {
