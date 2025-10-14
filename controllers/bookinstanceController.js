@@ -7,6 +7,9 @@ const Genre = require("../models/genre");
 const BookInstance = require("../models/bookinstance");
 const associations = require('../models/associations');
 
+// importing validation and sanitization methods
+const { body, validationResult } = require('express-validator');
+
 // then exports functions for each of the URLs we wish to handle
 
 // Display list of all BookInstances.
@@ -68,7 +71,16 @@ exports.bookinstance_detail = async (req, res, next) => {
 
 // Display BookInstance create form on GET.
 exports.bookinstance_create_get = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: BookInstance create GET");
+    try{
+        // Get all authors and genres, which we can use for adding to our book.
+        const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
+        const bookTxt = JSON.stringify(allBooksRaw);
+        const allBooks = JSON.parse(bookTxt);
+    
+        res.render("bookinstance_form", {title: "Create Book Instance", book_list: allBooks});
+    } catch(err){
+        console.log('debbug: ' + err);
+    }
 };
 
 // Handle BookInstance create on POST.
