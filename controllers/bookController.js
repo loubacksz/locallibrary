@@ -4,12 +4,12 @@
 const Book = require('../models/book');
 const Author = require("../models/author");
 const Genre = require("../models/genre");
+const GenreBook = require('../models/genrebook');
 const BookInstance = require("../models/bookinstance");
 const associations = require('../models/associations');
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
-const GenreBook = require('../models/genrebook');
     // this is just a function call that returns an object, and we DESTRUCTURE the two properties, 'body' and 'validationResult', from the object, 
     // so we can use them as variables directly
 
