@@ -9,7 +9,7 @@ block content
       select#book.form-control(name='book' required)
         option(value='') --Please select a book--
         for book in book_list
-          if selected_book==book.id.toString()
+          if selected_book==book.id
             option(value=book.id, selected) #{book.title}
           else
             option(value=book.id) #{book.title}

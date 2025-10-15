@@ -84,9 +84,61 @@ exports.bookinstance_create_get = async (req, res, next) => {
 };
 
 // Handle BookInstance create on POST.
-exports.bookinstance_create_post = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: BookInstance create POST");
-};
+exports.bookinstance_create_post = [
+    // v and s
+    body("book", "Book must be specified").trim().isLength({ min: 1 }).escape(),
+    body("imprint", "Imprint must be specified")
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body("status").escape(),
+    body("due_back", "Invalid date")
+        .optional({ values: "falsy" })
+        .isISO8601()
+        .toDate(),
+
+    // proccess request after v and s - this is making the request work properly
+    async (req, res, next) => {
+        try {
+            await associations();
+
+            // extract validation errors from a request
+            const errors = validationResult(req);
+
+            // create a bookinstance with escaped and trimmed data
+            const bookinstance = BookInstance.build({
+                imprint: req.body.imprint,
+                status: req.body.status,
+                dueBack: req.body.due_back,
+                bookId: req.body.book
+            });
+
+            // check for errors
+            if(!errors.isEmpty()){
+                // i can make this a function
+                const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
+                const bookTxt = JSON.stringify(allBooksRaw);
+                const allBooks = JSON.parse(bookTxt);
+
+                res.render('bookinstance_form', {
+                    title: 'Create Book Instance',
+                    book_list: allBooks,
+                    selected_book: bookinstance.bookId,
+                    bookinstance: bookinstance,
+                    errors: errors.array()
+                });
+                return;
+            }
+
+            await bookinstance.save();
+            res.redirect(bookinstance.url);
+        }
+        catch(err){
+            console.log("debbug: " + err);
+            console.log(req.body);
+        }
+    }
+];
 
 // Display BookInstance delete form on GET.
 exports.bookinstance_delete_get = async (req, res, next) => {

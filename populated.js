@@ -11,7 +11,7 @@ async function testModels(){
         await associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
         
-        const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
+        const allBooksRaw = await BookInstance.findAll();
         const bookTxt = JSON.stringify(allBooksRaw);
         const allBooks = JSON.parse(bookTxt);
 

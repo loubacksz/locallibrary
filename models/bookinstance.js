@@ -38,6 +38,16 @@ const BookInstance = database.define('bookinstance', {
                 return 'No due date!';
             }
         }
+    },
+    due_back_yyyy_mm_dd: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if (this.dueBack !== null) {
+                return DateTime.fromISO(this.dueBack).toISODate();
+            } else {
+                return 'No due date!';
+            }
+        }
     }
 }, {
     timestamps: false,
