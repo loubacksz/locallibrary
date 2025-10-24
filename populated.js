@@ -10,18 +10,22 @@ async function testModels(){
     try {
         await associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
-        
-        const allBooksRaw = await BookInstance.findAll();
-        const bookTxt = JSON.stringify(allBooksRaw);
-        const allBooks = JSON.parse(bookTxt);
+
+        // this is the difference between res.send() and res.render()
+        // res.send() - sends the HTTP response
+        // res.render() - renders a view and sends the rendered HTML string to the client
+
+        const authorRaw = await Author.findByPk(1);
+        const authorTxt = JSON.stringify(authorRaw);
+        const author = JSON.parse(authorTxt);
 
         console.log("------------------------------------------");
 
-        console.log(allBooks )
+        console.log(authorRaw)
 
         console.log("------------------------------------------");
 
-
+        console.log(author)
 
         console.log("------------------------------------------");
     }

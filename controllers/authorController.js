@@ -133,7 +133,30 @@ exports.author_create_post = [
 
 // Display Author delete form on GET
 exports.author_delete_get = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Author delete GET");
+    try{
+        await associations();
+
+        const authorRaw = await Author.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Book,
+                },
+            ],
+            order: [['first_name', 'ASC']],
+        });
+        const authorTxt = JSON.stringify(authorRaw);
+        const author = JSON.parse(authorTxt);
+
+        res.render("author_delete", {
+            title: "Delete Author",
+            author: author,
+            author_books: author.books
+        });
+    }
+    catch(err){
+        console.log('debbug: ' + err);
+    }
+    
 };
 
 // Handle Author delete POST
