@@ -147,6 +147,11 @@ exports.author_delete_get = async (req, res, next) => {
         const authorTxt = JSON.stringify(authorRaw);
         const author = JSON.parse(authorTxt);
 
+        if(author === null){
+            res.redirect('/catalog/authors');
+            return;
+        }
+
         res.render("author_delete", {
             title: "Delete Author",
             author: author,
