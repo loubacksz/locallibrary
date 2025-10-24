@@ -15,6 +15,9 @@ const { body, validationResult } = require('express-validator');
 
 // then exports functions for each of the URLs we wish to handle
 
+// Load Associations
+associations();
+
 exports.index = async (req, res, next) => {
     // Get details of books, book instances, authors and genre counts (in parallel)
 
@@ -45,8 +48,6 @@ exports.index = async (req, res, next) => {
 // Display list of all books
 exports.book_list = async (req, res, next) => {
     try{
-        await associations();
-
         const allBooks = await Book.findAll(
             {
                 include: {
@@ -69,8 +70,6 @@ exports.book_list = async (req, res, next) => {
 // Display detail page for a specific book
 exports.book_detail = async (req, res, next) => {
     try{
-        await associations();
-
         const bookDetail = await Book.findByPk(req.params.id, {
             include: [
                 {
@@ -155,8 +154,6 @@ exports.book_create_post = [
     
     // proccess request after v and s
     async (req, res, next) => {
-        await associations();
-
         // extract validation errors from a request
         const errors = validationResult(req);
 

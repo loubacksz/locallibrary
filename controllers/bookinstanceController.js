@@ -12,11 +12,12 @@ const { body, validationResult } = require('express-validator');
 
 // then exports functions for each of the URLs we wish to handle
 
+// Load Associations
+associations();
+
 // Display list of all BookInstances.
 exports.bookinstance_list = async (req, res, next) => {
     try{
-        await associations();
-
         const allBookInstances = await BookInstance.findAll({
             include: {
                 model: Book,
@@ -43,8 +44,6 @@ exports.bookinstance_list = async (req, res, next) => {
 // Display detail page for a specific BookInstance.
 exports.bookinstance_detail = async (req, res, next) => {
     try {
-        await associations();
-
         const bookInstanceDetail = await BookInstance.findByPk(req.params.id, {
             include: {
                 model: Book,
@@ -100,8 +99,6 @@ exports.bookinstance_create_post = [
     // proccess request after v and s - this is making the request work properly
     async (req, res, next) => {
         try {
-            await associations();
-
             // extract validation errors from a request
             const errors = validationResult(req);
 

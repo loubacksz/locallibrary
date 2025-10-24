@@ -7,7 +7,7 @@ const BookInstance = require('./bookinstance');
 
 // a problem with this file is that i can't call for only one association 
 
-const modelAssociations = async function modelAssociations() {
+const modelAssociations = function modelAssociations() {
 
     Author.hasMany(Book, {
         foreignKey: {

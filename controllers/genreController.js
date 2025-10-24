@@ -14,11 +14,12 @@ const { body, validationResult } = require('express-validator');
 
 // then exports functions for each of the URLs we wish to handle
 
+// Load Associations
+associations();
+
 // Display list of all Genre
 exports.genre_list = async (req, res, next) => {
     try{
-        await associations();
-
         const allGenres = await Genre.findAll({
             order: [['name', 'ASC']]
         });
@@ -37,8 +38,6 @@ exports.genre_list = async (req, res, next) => {
 // Display detail page for a specific Genre
 exports.genre_detail = async (req, res, next) => {
     try{
-        await associations();
-
         const genre = await Genre.findByPk(req.params.id, {
             include: {
                 model: Book,

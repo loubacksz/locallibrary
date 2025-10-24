@@ -12,11 +12,12 @@ const { body, validationResult } = require('express-validator');
 
 // then exports functions for each of the URLs we wish to handle
 
+// Load Associations
+associations();
+
 // Display list of all Authors.
 exports.author_list = async (req, res, next) => {
     try {
-        await associations();
-
         const allAuthors = await Author.findAll();
     
         res.render('author_list', {
@@ -31,8 +32,6 @@ exports.author_list = async (req, res, next) => {
 // Display detail page for a specific Author.
 exports.author_detail = async (req, res, next) => {
     try{
-        await associations();
-        
         const authorDetail = await Author.findByPk(req.params.id, {
             include: [
                 {
@@ -59,7 +58,7 @@ exports.author_detail = async (req, res, next) => {
     }
 };
 
-// Display Auhtor create form on GET.
+// Display Author create form on GET.
 exports.author_create_get = async (req, res, next) => { 
     res.render("author_form", {title: "Create Author"});
 };
@@ -134,8 +133,6 @@ exports.author_create_post = [
 // Display Author delete form on GET
 exports.author_delete_get = async (req, res, next) => {
     try{
-        await associations();
-
         const authorRaw = await Author.findByPk(req.params.id, {
             include: [
                 {
@@ -166,7 +163,42 @@ exports.author_delete_get = async (req, res, next) => {
 
 // Handle Author delete POST
 exports.author_delete_post = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Author delete POST");
+    try {
+        const authorRaw = await Author.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Book,
+                },
+            ],
+            order: [['first_name', 'ASC']],
+        });
+        const authorTxt = JSON.stringify(authorRaw);
+        const author = JSON.parse(authorTxt);
+
+        if(author.books > 0){
+            //author has books. send to get router again
+            res.render("author_delete", {
+                title: "Delete Author",
+                author: author,
+                author_books: author.books
+            });
+            return;
+        }
+        
+        //validate what's coming
+        if (req.params.id === null) {
+            res.send('No author has been provided!');
+            return;
+        }
+        await Author.destroy({
+            where: {
+                id: req.params.id
+            }
+        });
+        res.redirect("/catalog/authors");
+    } catch(err){
+        console.log('debug: ' + err);
+    }
 };
 
 // Display Author update form on GET

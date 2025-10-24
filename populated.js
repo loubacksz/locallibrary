@@ -15,7 +15,11 @@ async function testModels(){
         // res.send() - sends the HTTP response
         // res.render() - renders a view and sends the rendered HTML string to the client
 
-        const authorRaw = await Author.findByPk(1);
+        const authorRaw = await Author.destroy({
+            where: {
+                id: 3
+            }
+        });
         const authorTxt = JSON.stringify(authorRaw);
         const author = JSON.parse(authorTxt);
 
