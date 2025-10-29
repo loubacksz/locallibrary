@@ -15,21 +15,10 @@ async function testModels(){
         // res.send() - sends the HTTP response
         // res.render() - renders a view and sends the rendered HTML string to the client
 
-        const bookRaw = await Book.findByPk(1, {
-            include: [
-                {
-                    model: Author,
-                    attributes: ['id', 'first_name', 'family_name', 'name', 'url']
-                },
-                {
-                    model: Genre,
-                },
-                {
-                    model: BookInstance,
-                    attributes: { include: [['dueBack', 'due_back']] }
-                }
-            ],
-            order: [['title', 'ASC']],
+        const bookRaw = await Book.destroy({
+            where: {
+                id: 44
+            }
         });
         const book_text = JSON.stringify(bookRaw);
         const book = JSON.parse(book_text);

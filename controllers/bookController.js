@@ -225,12 +225,6 @@ exports.book_create_post = [
 // Display book delete form on GET
 exports.book_delete_get = async (req, res, next) => {
     try{
-        if(req.params.id === null) {
-            const error = new Error('Book not found');
-            error.status = 404;
-            return res.send(error);
-        }
-
         const bookRaw = await Book.findByPk(req.params.id, {
             include: [
                 {
@@ -259,16 +253,62 @@ exports.book_delete_get = async (req, res, next) => {
             book: book,
             book_instances: book.bookinstances
         });
-    }
-    catch(err){
+    } catch(err){
         console.log("debug: " + err);
     }
 };
 
 // Handle book delete on POST
 exports.book_delete_post = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Book delete POST");
-};
+    try{
+        const bookRaw = await Book.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Author,
+                    attributes: ['id', 'first_name', 'family_name', 'name', 'url']
+                },
+                {
+                    model: Genre,
+                },
+                {
+                    model: BookInstance,
+                    attributes: { include: [['dueBack', 'due_back']] }
+                }
+            ],
+            order: [['title', 'ASC']],
+        });
+        const book_text = JSON.stringify(bookRaw);
+        const book = JSON.parse(book_text);
+
+        if(bookRaw === null){
+            res.redirect("/catalog/books");
+        }
+
+        if(book.bookinstances > 0){
+            res.render("book_delete", {
+                title: "Delete Book",
+                book: book,
+                book_instances: book.bookinstances
+            });
+        }
+
+        const destroy = await Book.destroy({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if(destroy === 0){
+            const error = new Error("Book not deleted!");
+            error.status = 503
+            return next(error);
+        }
+
+        res.redirect("/catalog/books")
+    } catch(err){
+        console.log("debug: " + err);
+    }
+}
 
 // Display book update form on GET
 exports.book_update_get = async (req, res, next) => {
