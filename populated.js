@@ -8,7 +8,7 @@ const associations = require('./models/associations');
 
 async function testModels(){
     try {
-        await associations(); //it's necessary to call the associations before making CRUD
+        associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
 
         // this is the difference between res.send() and res.render()
