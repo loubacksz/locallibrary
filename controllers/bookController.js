@@ -224,7 +224,45 @@ exports.book_create_post = [
 
 // Display book delete form on GET
 exports.book_delete_get = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Book delete GET");
+    try{
+        if(req.params.id === null) {
+            const error = new Error('Book not found');
+            error.status = 404;
+            return res.send(error);
+        }
+
+        const bookRaw = await Book.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Author,
+                    attributes: ['id', 'first_name', 'family_name', 'name', 'url']
+                },
+                {
+                    model: Genre,
+                },
+                {
+                    model: BookInstance,
+                    attributes: { include: [['dueBack', 'due_back']] }
+                }
+            ],
+            order: [['title', 'ASC']],
+        });
+        const book_text = JSON.stringify(bookRaw);
+        const book = JSON.parse(book_text);
+        
+        if(book === null) {
+            res.redirect("/catalog/books");
+        }
+
+        res.render("book_delete", {
+            title: "Delete Book", 
+            book: book,
+            book_instances: book.bookinstances
+        });
+    }
+    catch(err){
+        console.log("debug: " + err);
+    }
 };
 
 // Handle book delete on POST
