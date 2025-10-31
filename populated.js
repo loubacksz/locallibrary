@@ -11,13 +11,11 @@ async function testModels(){
         associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
 
-        // this is the difference between res.send() and res.render()
-        // res.send() - sends the HTTP response
-        // res.render() - renders a view and sends the rendered HTML string to the client
+        // next() - calling it within a middleware function passes control to the next middleware function in the stack
 
-        const bookRaw = await Book.destroy({
-            where: {
-                id: 44
+        const bookRaw = await BookInstance.findByPk(1,{
+            include: {
+                model: Book
             }
         });
         const book_text = JSON.stringify(bookRaw);
