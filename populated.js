@@ -13,7 +13,7 @@ async function testModels(){
 
         // next() - calling it within a middleware function passes control to the next middleware function in the stack
 
-        const bookRaw = await BookInstance.destroy({
+        const bookRaw = await Genre.findByPk(1, {
             where: {
                 id: 8
             }

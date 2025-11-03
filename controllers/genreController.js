@@ -38,16 +38,16 @@ exports.genre_list = async (req, res, next) => {
 // Display detail page for a specific Genre
 exports.genre_detail = async (req, res, next) => {
     try{
-        const genre = await Genre.findByPk(req.params.id, {
+        const genreRaw = await Genre.findByPk(req.params.id, {
             include: {
                 model: Book,
             },
             order: [['name', 'ASC'], [Book, 'title', 'ASC']]
         });
-        const text = JSON.stringify(genre);
-        const json = JSON.parse(text);
+        const genreTxt = JSON.stringify(genreRaw);
+        const genre = JSON.parse(genreTxt);
 
-        if(json === null) {
+        if(genre === null) {
             const error = new Error('Genre not found');
             error.status = 404;
             return next(error);
@@ -55,8 +55,8 @@ exports.genre_detail = async (req, res, next) => {
         
         res.render('genre_detail', {
             title: 'Genre Detail',
-            json,
-            genre_books: json.books
+            genre,
+            genre_books: genre.books
         });
     } catch(err){
         console.log('debbug: ' + err);
@@ -123,7 +123,27 @@ exports.genre_create_post = [
 
 // Display Genre delete form on GET
 exports.genre_delete_get = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Genre delete GET");
+    try{
+        const genreRaw = await Genre.findByPk(req.params.id, {
+            include: {
+                model: Book,
+            },
+            order: [['name', 'ASC'], [Book, 'title', 'ASC']]
+        });
+        const genreTxt = JSON.stringify(genreRaw);
+        const genre = JSON.parse(genreTxt);
+
+        if(genreRaw === null){
+            res.redirect('/catalog/genres');
+        }
+        
+        res.render("genre_delete",{
+            genre,
+            genre_books: genre.books
+        });
+    } catch(err){
+        console.log('debug: ' + err);
+    }
 };
 
 // Handle Genre delete on POST
