@@ -163,7 +163,34 @@ exports.bookinstance_delete_get = async (req, res, next) => {
 
 // Handle BookInstance delete on POST.
 exports.bookinstance_delete_post = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: BookInstance delete POST");
+    try{
+        const bookinstanceRaw = await BookInstance.destroy({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if(bookinstanceRaw === 0){
+            // no rows delelte in the database
+            const getbookinstanceRaw = await BookInstance.findByPk(req.params.id, {
+                include: {
+                    model: Book
+                }
+            });
+            const bookinstanceTxt = JSON.stringify(getbookinstanceRaw);
+            const bookinstance = JSON.parse(bookinstanceTxt);
+
+            res.render("bookinstance_delete", {
+                title: "Delete Bookinstance",
+                bookinstance: bookinstance,
+                deleted: 0
+            });
+        }
+
+        res.redirect("/catalog/bookinstances");
+    } catch(err){
+        console.log("debug: " + err);
+    }
 };
 
 // Display BookInstance update form on GET.

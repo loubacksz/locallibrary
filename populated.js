@@ -13,9 +13,9 @@ async function testModels(){
 
         // next() - calling it within a middleware function passes control to the next middleware function in the stack
 
-        const bookRaw = await BookInstance.findByPk(1,{
-            include: {
-                model: Book
+        const bookRaw = await BookInstance.destroy({
+            where: {
+                id: 8
             }
         });
         const book_text = JSON.stringify(bookRaw);
