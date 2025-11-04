@@ -175,8 +175,7 @@ exports.author_delete_post = async (req, res, next) => {
         const authorTxt = JSON.stringify(authorRaw);
         const author = JSON.parse(authorTxt);
 
-        if(author.books > 0){
-            //author has books. send to get router again
+        if(author.books.length > 0){
             res.render("author_delete", {
                 title: "Delete Author",
                 author: author,
@@ -185,16 +184,18 @@ exports.author_delete_post = async (req, res, next) => {
             return;
         }
         
-        //validate what's coming
-        if (req.params.id === null) {
-            res.send('No author has been provided!');
-            return;
-        }
-        await Author.destroy({
+        const destroy = await Author.destroy({
             where: {
                 id: req.params.id
             }
         });
+
+        if(destroy === 0){
+            const error = new Error("Book not deleted!");
+            error.status = 503
+            return next(error);
+        }
+
         res.redirect("/catalog/authors");
     } catch(err){
         console.log('debug: ' + err);

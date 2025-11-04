@@ -261,7 +261,7 @@ exports.book_delete_get = async (req, res, next) => {
 // Handle book delete on POST
 exports.book_delete_post = async (req, res, next) => {
     try{
-        const getbookRaw = await Book.findByPk(req.params.id, {
+        const bookRaw = await Book.findByPk(req.params.id, {
             include: [
                 {
                     model: Author,
@@ -277,10 +277,10 @@ exports.book_delete_post = async (req, res, next) => {
             ],
             order: [['title', 'ASC']],
         });
-        const bookTxt = JSON.stringify(getbookRaw);
+        const bookTxt = JSON.stringify(bookRaw);
         const book = JSON.parse(bookTxt);
 
-        if(getbookRaw === null){
+        if(bookRaw === null){
             res.redirect("/catalog/books");
         }
 
