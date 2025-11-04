@@ -11,23 +11,29 @@ async function testModels(){
         associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
 
-        // next() - calling it within a middleware function passes control to the next middleware function in the stack
+        // remember to ALWAYS use the 'length' property when checking the size of an array
 
-        const bookRaw = await Genre.findByPk(1, {
-            where: {
-                id: 8
-            }
+        const getGenreRaw = await Genre.findByPk(2, {
+            include: {
+                model: Book,
+            },
+            order: [['name', 'ASC'], [Book, 'title', 'ASC']]
         });
-        const book_text = JSON.stringify(bookRaw);
-        const book = JSON.parse(book_text);
+        const genreTxt = JSON.stringify(getGenreRaw);
+        const genre = JSON.parse(genreTxt);
+
+        console.log("test")
+        if (getGenreRaw.books.length > 0){
+            console.log(true);
+        }
 
         console.log("------------------------------------------");
 
-        console.log(bookRaw)
+        console.log(getGenreRaw.books.length > 0)
 
         console.log("------------------------------------------");
 
-        console.log(book)
+        console.log(genre.books.length);
 
         console.log("------------------------------------------");
     }
