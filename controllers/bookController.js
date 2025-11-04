@@ -261,7 +261,7 @@ exports.book_delete_get = async (req, res, next) => {
 // Handle book delete on POST
 exports.book_delete_post = async (req, res, next) => {
     try{
-        const bookRaw = await Book.findByPk(req.params.id, {
+        const getbookRaw = await Book.findByPk(req.params.id, {
             include: [
                 {
                     model: Author,
@@ -277,19 +277,20 @@ exports.book_delete_post = async (req, res, next) => {
             ],
             order: [['title', 'ASC']],
         });
-        const book_text = JSON.stringify(bookRaw);
-        const book = JSON.parse(book_text);
+        const bookTxt = JSON.stringify(getbookRaw);
+        const book = JSON.parse(bookTxt);
 
-        if(bookRaw === null){
+        if(getbookRaw === null){
             res.redirect("/catalog/books");
         }
 
-        if(book.bookinstances > 0){
+        if(book.bookinstances.length > 0){
             res.render("book_delete", {
                 title: "Delete Book",
                 book: book,
                 book_instances: book.bookinstances
             });
+            return;
         }
 
         const destroy = await Book.destroy({
