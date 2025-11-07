@@ -115,8 +115,8 @@ exports.book_create_get = async (req, res, next) => {
             }),
         ]);
         const authorsTxt = JSON.stringify(allAuthorsRaw);
-        const genresTxt = JSON.stringify(allGenresRaw);
         const allAuthors = JSON.parse(authorsTxt);
+        const genresTxt = JSON.stringify(allGenresRaw);
         const allGenres = JSON.parse(genresTxt);
     
         res.render("book_form", {title: "Create Book", authors: allAuthors, genres: allGenres});
@@ -200,9 +200,9 @@ exports.book_create_post = [
             const allGenres = JSON.parse(genresTxt);
 
             // mark our selected genres as checked | here we're verifying if the genre array created above using the form is included on the Book object build above
-            // if true - (i think)we create the 'checked' attribute and mark it as true | here we'll use the genrebook model
+            // if true - (i think)we create the 'checked' attribute and mark it as true | here we'll use the genrebook model / we do create the attribute
             for (const genre of allGenres) {
-                if (findBook.genres.id = genre.id) {
+                if (findBook.genres.id == genre.id) {
                     genre.checked = "true";
                 }
             }
@@ -241,8 +241,8 @@ exports.book_delete_get = async (req, res, next) => {
             ],
             order: [['title', 'ASC']],
         });
-        const book_text = JSON.stringify(bookRaw);
-        const book = JSON.parse(book_text);
+        const bookTxt = JSON.stringify(bookRaw);
+        const book = JSON.parse(bookTxt);
         
         if(book === null) {
             res.redirect("/catalog/books");
@@ -313,7 +313,55 @@ exports.book_delete_post = async (req, res, next) => {
 
 // Display book update form on GET
 exports.book_update_get = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Book update GET");
+    try{
+        const [allAuthorsRaw, allGenresRaw, bookRaw, findBook] = await Promise.all([
+            Author.findAll({ order: [['first_name', 'ASC']] }),
+            Genre.findAll({
+                order: [['name', 'ASC']]
+            }),
+            Book.findByPk(req.params.id, {
+                include: [
+                    {
+                        model: Author,
+                        attributes: ['id', 'first_name', 'family_name', 'name', 'url']
+                    },
+                    {
+                        model: Genre,
+                    }
+                ],
+                order: [['title', 'ASC']],
+            }),
+            await Book.findByPk(req.params.id, {include: [{model: Genre, attributes: ['id']}]})
+        ]);
+
+        const authorsTxt = JSON.stringify(allAuthorsRaw);
+        const allAuthors = JSON.parse(authorsTxt);
+        
+        const genresTxt = JSON.stringify(allGenresRaw);
+        const allGenres = JSON.parse(genresTxt);
+        
+        const bookTxt = JSON.stringify(bookRaw);
+        const book = JSON.parse(bookTxt);
+
+        if(bookRaw === null){
+            const error = new Error('Book not found');
+            error.status = 404;
+            return next(error);
+        }
+
+        // i want to check if book.genres.id is equal to any of the allGenres.id and mark the property 'checked' true if so
+        for (const genre of allGenres) {
+            book.genres.forEach((genreId) => {
+                if (genreId.id == genre.id) {
+                    genre.checked = "true";
+                }
+            });
+        }
+
+        res.render("book_form", {title: "Update Book", authors: allAuthors, genres: allGenres, book, findBook});
+    } catch(err){
+        console.log('debug: ' + err);
+    }
 };
 
 // Handle book update on POST
