@@ -13,27 +13,19 @@ async function testModels(){
 
         // remember to ALWAYS use the 'length' property when checking the size of an array
 
-        const getGenreRaw = await Genre.findByPk(2, {
-            include: {
-                model: Book,
-            },
-            order: [['name', 'ASC'], [Book, 'title', 'ASC']]
-        });
-        const genreTxt = JSON.stringify(getGenreRaw);
-        const genre = JSON.parse(genreTxt);
-
-        console.log("test")
-        if (getGenreRaw.books.length > 0){
-            console.log(true);
-        }
+        const [getBookRaw] = await Promise.all([
+            Book.findByPk(23, { include: [{ model: Genre }, { model: Author }] }),
+        ])
+        const bookTxt = JSON.stringify(getBookRaw);
+        const book = JSON.parse(bookTxt);
 
         console.log("------------------------------------------");
 
-        console.log(getGenreRaw.books.length > 0)
+        console.log(book.genres)
 
         console.log("------------------------------------------");
 
-        console.log(genre.books.length);
+        console.log();
 
         console.log("------------------------------------------");
     }
