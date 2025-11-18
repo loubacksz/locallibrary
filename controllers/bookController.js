@@ -447,20 +447,20 @@ exports.book_update_post = [
                 }
             });
 
-            genresId.forEach(async (formGenreId) => {
-                if (!req.body.genre.includes(formGenreId)) {
+            genresId.forEach(async (genreId) => {
+                if (!req.body.genre.includes(genreId)) {
                     try {
                         const genrebook = await GenreBook.destroy({
                             where: {
-                                genreId: formGenreId,
+                                genreId: genreId,
                                 bookId: book.id
                             }
                         });
                     } catch (err) {
                         console.log("debug: " + err);
                     }
-                } else if (req.body.genre.includes(formGenreId)) {
-                    console.log("INCLUDED: " + formGenreId);
+                } else if (req.body.genre.includes(genreId)) {
+                    console.log("INCLUDED: " + genreId);
                 }
             });
 
