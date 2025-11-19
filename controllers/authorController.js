@@ -204,7 +204,18 @@ exports.author_delete_post = async (req, res, next) => {
 
 // Display Author update form on GET
 exports.author_update_get = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Author update GET");
+    try{
+        const authorRaw = await Author.findByPk(req.params.id);
+        const authorTxt = JSON.stringify(authorRaw);
+        const author = JSON.parse(authorTxt);
+
+        res.render('author_form', {
+            title: "Update Author",
+            author: author,
+        });
+    } catch(err){
+        console.log('debug: ' + err);
+    }
 };
 
 // Handle Author update on POST
