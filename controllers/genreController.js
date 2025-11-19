@@ -190,7 +190,15 @@ exports.genre_delete_post = async (req, res, next) => {
 
 // Display Genre update form on GET
 exports.genre_update_get = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Genre update GET");
+    try {
+        const getGenreRaw = await Genre.findByPk(req.params.id);
+        const genreTxt = JSON.stringify(getGenreRaw);
+        const genre = JSON.parse(genreTxt);
+
+        res.render("genre_form", {title: "Update Genre", genre: genre});
+    } catch(err){
+        console.log('debug: ' + err);
+    }
 };
 
 // Handle Genre update on POST
