@@ -195,7 +195,30 @@ exports.bookinstance_delete_post = async (req, res, next) => {
 
 // Display BookInstance update form on GET.
 exports.bookinstance_update_get = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: BookInstance update GET");
+    try{
+        const [bookInstanceRaw, bookRaw] = await Promise.all([
+            BookInstance.findByPk(req.params.id, {
+                include: {
+                    model: Book,
+                    attributes: ['id', 'title', 'url']
+                },
+                attributes: { exclude: ['bookId'] },
+            }),
+            Book.findAll({ order: [['title', 'ASC']] })
+        ]);
+        const bookinstanceTxt = JSON.stringify(bookInstanceRaw);
+        const bookinstance = JSON.parse(bookinstanceTxt);
+
+        res.render("bookinstance_form", {
+            title: "Update Book Instance",
+            book_list: bookRaw,
+            selected_book: bookinstance.book.id,
+            bookinstance: bookinstance,
+
+        });
+    } catch(err){
+        console.log("debug: " + err);
+    }
 };
 
 // Handle bookinstance update on POST.
