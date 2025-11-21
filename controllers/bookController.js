@@ -8,16 +8,15 @@ const GenreBook = require('../models/genrebook');
 const BookInstance = require("../models/bookinstance");
 const associations = require('../models/associations');
 
-// importing validation and sanitization methods
+// importing 'express-validator' for validation and sanitization
+// this is just a function call that returns an object and we DESTRUCTURE the two properties 'body' and 'validationResult' from it, so we can use the properties as variables directly
 const { body, validationResult } = require('express-validator');
 const { where } = require('sequelize');
-// this is just a function call that returns an object, and we DESTRUCTURE the two properties, 'body' and 'validationResult', from the object, 
-// so we can use them as variables directly
-
-// then exports functions for each of the URLs we wish to handle
 
 // Load Associations
 associations();
+
+// then exports functions for each of the URLs we wish to handle
 
 exports.index = async (req, res, next) => {
     // Get details of books, book instances, authors and genre counts (in parallel)
