@@ -17,14 +17,14 @@ associations();
 
 // Display list of all BookInstances.
 exports.bookinstance_list = async (req, res, next) => {
-    try{
+    try {
         const allBookInstances = await BookInstance.findAll({
             include: {
                 model: Book,
                 attributes: ['title'],
             },
             attributes: {
-                include:[['dueBack', 'due_back']]
+                include: [['dueBack', 'due_back']]
             },
             order: [[Book, 'title', 'ASC']]
         });
@@ -36,7 +36,7 @@ exports.bookinstance_list = async (req, res, next) => {
             title: "Book Instance List",
             bookinstance_list: json,
         });
-    } catch(err){
+    } catch (err) {
         console.log('debbug: ' + err);
     }
 };
@@ -54,7 +54,7 @@ exports.bookinstance_detail = async (req, res, next) => {
         const text = JSON.stringify(bookInstanceDetail);
         const bookinstance = JSON.parse(text);
 
-        if(bookinstance === null){
+        if (bookinstance === null) {
             const error = new Error('Book Instance not found!');
             error.status = 404;
             return error.status;
@@ -70,14 +70,14 @@ exports.bookinstance_detail = async (req, res, next) => {
 
 // Display BookInstance create form on GET.
 exports.bookinstance_create_get = async (req, res, next) => {
-    try{
+    try {
         // Get all authors and genres, which we can use for adding to our book.
         const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
         const bookTxt = JSON.stringify(allBooksRaw);
         const allBooks = JSON.parse(bookTxt);
-    
-        res.render("bookinstance_form", {title: "Create Book Instance", book_list: allBooks});
-    } catch(err){
+
+        res.render("bookinstance_form", { title: "Create Book Instance", book_list: allBooks });
+    } catch (err) {
         console.log('debbug: ' + err);
     }
 };
@@ -111,7 +111,7 @@ exports.bookinstance_create_post = [
             });
 
             // check for errors
-            if(!errors.isEmpty()){
+            if (!errors.isEmpty()) {
                 // i can make this a function
                 const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
                 const bookTxt = JSON.stringify(allBooksRaw);
@@ -130,7 +130,7 @@ exports.bookinstance_create_post = [
             await bookinstance.save();
             res.redirect(bookinstance.url);
         }
-        catch(err){
+        catch (err) {
             console.log("debbug: " + err);
             console.log(req.body);
         }
@@ -139,7 +139,7 @@ exports.bookinstance_create_post = [
 
 // Display BookInstance delete form on GET.
 exports.bookinstance_delete_get = async (req, res, next) => {
-    try{
+    try {
         const bookinstanceRaw = await BookInstance.findByPk(req.params.id, {
             include: {
                 model: Book
@@ -148,7 +148,7 @@ exports.bookinstance_delete_get = async (req, res, next) => {
         const bookinstanceTxt = JSON.stringify(bookinstanceRaw);
         const bookinstance = JSON.parse(bookinstanceTxt);
 
-        if(bookinstanceRaw === null){
+        if (bookinstanceRaw === null) {
             res.redirect("/catalog/bookinstances");
         }
 
@@ -156,21 +156,21 @@ exports.bookinstance_delete_get = async (req, res, next) => {
             title: "Delete Bookinstance",
             bookinstance: bookinstance
         });
-    } catch(err){
+    } catch (err) {
         console.log("debug: " + err);
     }
 };
 
 // Handle BookInstance delete on POST.
 exports.bookinstance_delete_post = async (req, res, next) => {
-    try{
+    try {
         const bookinstanceRaw = await BookInstance.destroy({
             where: {
                 id: req.params.id
             }
         });
 
-        if(bookinstanceRaw === 0){
+        if (bookinstanceRaw === 0) {
             // no rows delelte in the database
             const getbookinstanceRaw = await BookInstance.findByPk(req.params.id, {
                 include: {
@@ -188,14 +188,14 @@ exports.bookinstance_delete_post = async (req, res, next) => {
         }
 
         res.redirect("/catalog/bookinstances");
-    } catch(err){
+    } catch (err) {
         console.log("debug: " + err);
     }
 };
 
 // Display BookInstance update form on GET.
 exports.bookinstance_update_get = async (req, res, next) => {
-    try{
+    try {
         const [bookInstanceRaw, bookRaw] = await Promise.all([
             BookInstance.findByPk(req.params.id, {
                 include: {
@@ -216,12 +216,69 @@ exports.bookinstance_update_get = async (req, res, next) => {
             bookinstance: bookinstance,
 
         });
-    } catch(err){
+    } catch (err) {
         console.log("debug: " + err);
     }
 };
 
 // Handle bookinstance update on POST.
-exports.bookinstance_update_post = async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: BookInstance update POST");
-};
+exports.bookinstance_update_post = [
+    // v and s
+    body("book", "Book must be specified").trim().isLength({ min: 1 }).escape(),
+    body("imprint", "Imprint must be specified")
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body("status").escape(),
+    body("due_back", "Invalid date")
+        .optional({ values: "falsy" })
+        .isISO8601()
+        .toDate(),
+
+    // proccess request after v and s - this is making the request work properly
+    async (req, res, next) => {
+        try {
+            // extract validation errors from a request
+            const errors = validationResult(req);
+
+            // check for errors
+            if (!errors.isEmpty()) {
+                // i can make this a function
+                const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
+                const bookTxt = JSON.stringify(allBooksRaw);
+                const allBooks = JSON.parse(bookTxt);
+
+                res.render('bookinstance_form', {
+                    title: 'Create Book Instance',
+                    book_list: allBooks,
+                    selected_book: bookinstance.bookId,
+                    bookinstance: bookinstance,
+                    errors: errors.array()
+                });
+                return;
+            }
+
+            if (req.body.due_back === '') {
+                req.body.due_back = null;
+            }
+
+            const getbookinstanceRaw = await BookInstance.findByPk(req.params.id);
+            const bookinstanceTxt = JSON.stringify(getbookinstanceRaw);
+            const bookinstance = JSON.parse(bookinstanceTxt);
+
+            await BookInstance.update({
+                imprint: req.body.imprint,
+                status: req.body.status,
+                dueBack: req.body.due_back,
+                bookId: req.body.book
+            },
+                { where: { id: req.params.id } }
+            );
+
+            res.redirect(bookinstance.url);
+        }
+        catch (err) {
+            console.log("debbug: " + err);
+        }
+    }
+];
