@@ -80,12 +80,10 @@ exports.author_create_post = [
         .withMessage("Family name must be specified."),
     body("date_of_birth", "Invalid date of birth")
         .optional({ values: "falsy" })
-        .isISO8601()
-        .toDate(),
+        .isISO8601(),
     body("date_of_death", "Invalid date of death")
         .optional({ values: "falsy" })
-        .isISO8601()
-        .toDate(),
+        .isISO8601(),
 
     // process the request after v and s
     async (req, res, next) => {
@@ -233,12 +231,10 @@ exports.author_update_post = [
         .withMessage("Family name must be specified."),
     body("date_of_birth", "Invalid date of birth")
         .optional({ values: "falsy" })
-        .isISO8601()
-        .toDate(),
+        .isISO8601(),
     body("date_of_death", "Invalid date of death")
         .optional({ values: "falsy" })
-        .isISO8601()
-        .toDate(),
+        .isISO8601(),
 
     // process the request after v and s
     async (req, res, next) => {

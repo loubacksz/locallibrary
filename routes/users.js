@@ -10,4 +10,5 @@ router.get('/cool', (req, res) => {
   res.send("You're so cool!");
 });
 
+// this router object is used by the express app
 module.exports = router;

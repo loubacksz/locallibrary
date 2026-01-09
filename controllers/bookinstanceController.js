@@ -93,8 +93,7 @@ exports.bookinstance_create_post = [
     body("status").escape(),
     body("due_back", "Invalid date")
         .optional({ values: "falsy" })
-        .isISO8601()
-        .toDate(),
+        .isISO8601(),
 
     // proccess request after v and s - this is making the request work properly
     async (req, res, next) => {
@@ -232,8 +231,7 @@ exports.bookinstance_update_post = [
     body("status").escape(),
     body("due_back", "Invalid date")
         .optional({ values: "falsy" })
-        .isISO8601()
-        .toDate(),
+        .isISO8601(),
 
     // proccess request after v and s - this is making the request work properly
     async (req, res, next) => {
