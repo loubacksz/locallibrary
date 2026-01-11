@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize');
 const database = require('../db/dbConnection');
 
 /* 
-database = sequelize variable from /bin/www.js - it's the connection with the database
-the sequelize variable stores the Sequelize object that create the connection with the db
+    database = sequelize variable from /db/dbConnection - it's the connection with the database
+    the sequelize variable stores the Sequelize object that create the connection with the db
 */
 
 const Author = database.define('author', {
