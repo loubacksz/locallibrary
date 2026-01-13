@@ -40,8 +40,8 @@ const modelAssociations = function modelAssociations() {
     });
 
     // defining only a customized FK might generate duplicated columns - so it better use an ALIAS
-    Role.hasMany(User, { as: 'assigned', foreignKey: {name:'role_id', allowNull: false} });
-    User.belongsTo(Role, { as: 'is', foreignKey: {name:'role_id', allowNull: false} });
+    Role.hasMany(User);
+    User.belongsTo(Role, {foreignKey: {name:'role_id', allowNull: false} });
 }
 
 module.exports = modelAssociations;
