@@ -9,6 +9,7 @@
     "serverstart": "SET DEBUG=express-locallibrary-tutorial:* & npm run devstart"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.6",
     "debug": "^4.3.5",
     "express": "^4.19.2",

@@ -10,10 +10,10 @@ const associations = require('./models/associations');
 
 async function testModels(){
     try {
-        associations(); //it's necessary to call the associations before making CRUD
+        //associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
 
-        const create = await User.create({role_name: 'admin'});
+        //const create = await User.create({role_name: 'admin'});
 
         // remember to ALWAYS use the 'length' property when checking the size of an array
 
