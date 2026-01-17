@@ -19,7 +19,9 @@ associations();
 // then exports functions for each of the URLs we wish to handle
 
 exports.user_signup_get = (req, res, next) => {
-    res.send("NOT IMPLEMENTED");
+    res.render('signup_form', {
+        title: "It's great to have you with us!"
+    });
 }
 
 exports.user_signup_post = (req, res, next) => {
