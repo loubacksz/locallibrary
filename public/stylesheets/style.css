@@ -3,3 +3,12 @@
   padding: 0;
   list-style: none;
 }
+
+.form-container {
+  max-width: 400px;
+  width: 100%;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
