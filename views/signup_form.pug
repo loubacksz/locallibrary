@@ -10,7 +10,7 @@ html(lang='en')
     block content
     div(class='container-fluid vh-100 d-flex flex-column justify-content-center align-items-center p-3')
         div(class='row text-center mb-4')
-            h1=title
+            h2=title
         div(class='form-container')
             form(method='POST')
                 div.form-group.mb-3
@@ -29,6 +29,3 @@ html(lang='en')
                         for error in errors
                             li!= error.msg
             hr(class='my-3')
-            div(class='text-center')
-                p(class='mb-2 small') Don't have an account?
-                a.btn.btn-outline-primary(href='http://localhost:4000/users/signup' class='w-100') Sign Up
