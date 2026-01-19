@@ -22,7 +22,8 @@ const User = database.define('user', {
     user_email: {
         type: DataTypes.STRING(100),
         allowNull: false,
-        maxLength: 100 
+        maxLength: 100,
+        unique: true
     },
 }, {
     timestamps: false,

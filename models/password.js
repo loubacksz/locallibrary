@@ -11,7 +11,6 @@ const database = require('../db/dbConnection');
 const Password = database.define('password', {
     user_id: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
         primaryKey: true,
     },
     user_password: { 
