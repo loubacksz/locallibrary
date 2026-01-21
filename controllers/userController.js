@@ -123,6 +123,23 @@ exports.user_login_get = (req, res, next) => {
     });
 }
 
-exports.user_login_post = (req, res, next) => {
-    res.send("NOT IMPLEMENTED");
-}
+exports.user_login_post = [
+    // validate and sanitize
+    body("name", "Name must contain at least 3 characters")
+        .trim()
+        .isString()
+        .isLength({ min: 3 })
+        .escape(),
+
+    body("email", "Invalid e-mail")
+        .trim()
+        .isAscii()
+        .isEmail()
+        .escape(),
+
+    body("password", "Password must contain at least 8 characters - 1 lowercase, 1 uppercase, 1 number and 1 symbol")
+        .trim()
+        .isAscii()
+        .isStrongPassword()
+        .escape(),
+]

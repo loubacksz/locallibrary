@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // require controller modules
-const user_controller = require('../controllers/user');
+const user_controller = require('../controllers/userController');
 
 /// SIGN UP ROUTES ///
 
