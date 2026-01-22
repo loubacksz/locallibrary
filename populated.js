@@ -15,28 +15,27 @@ async function testModels(){
         associations(); //it's necessary to call the associations before making CRUD
         //await database.sync({alter: {drop: false}}); //- no need to sync every time, this will only change the tables
 
-        const userRaw = await User.create({
-            user_name: 'Lightning Mcqueen',
-            user_email: 'lightningmcqueen@outlook.com',
-            role_id: 2
-        });
+        // const saltRaw = await Password.findAll({
+        //     attributes: ['user_salt', 'user_password'],
+        //     include: [{
+        //         model: User,
+        //         where: {
+        //             user_email: 'tommatter@gmail.com'
+        //     }}],
+        // });
 
-        const userTxt = JSON.stringify(userRaw);
-        const user = JSON.parse(userTxt);
+        // const saltTxt = JSON.stringify(saltRaw);
+        // const salt = JSON.parse(saltTxt);
 
-        await bcrypt.genSalt(async (err, salt) => {
-            await bcrypt.hash('password', salt, async (err, hash) => {
-                const password = await Password.create({
-                    user_id: user.id,
-                    user_salt: salt,
-                    user_hash: 2
-                });
-            })
-        });
+        const salt = await sequelize.query('SELECT user_password, user_salt ' +
+                                           'FROM password ' + 
+                                           'LEFT JOIN user ' +
+                                           'ON password.user_id = user.user_id ' +
+                                           'WHERE user.user_email = ?' , { replacements: [`${req.body.email.toLowerCase()}`], type: sequelize.QueryTypes.SELECT });
 
         console.log("------------------------------------------");
 
-        console.log(user);
+        console.log(salt);
 
         console.log("------------------------------------------");
 
