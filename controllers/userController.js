@@ -1,15 +1,11 @@
 // now we are creating the controllers! 
 
 // first we need to import the modules - we'll later be using to access and update our data
-const Book = require('../models/book');
-const Author = require('../models/author');
-const GenreBook = require('../models/genrebook');
-const Genre = require('../models/genre');
-const BookInstance = require('../models/bookinstance');
 const Password = require('../models/password');
 const User = require('../models/user');
 const associations = require('../models/associations');
-const bcrypt = require('bcrypt');
+const bcrypt= require('bcrypt');
+const sequelize = require('../db/dbConnection');
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
@@ -31,8 +27,12 @@ exports.user_signup_post = [
     // validate and sanitize
     body("name", "Name must contain at least 3 characters")
         .trim()
-        .isString()
         .isLength({ min: 3 })
+        .escape(),
+
+    body("name", "Name must contain only letters")
+        .trim()
+        .isAlpha()
         .escape(),
 
     body("email", "Invalid e-mail")
@@ -41,7 +41,7 @@ exports.user_signup_post = [
         .isEmail()
         .escape(),
 
-    body("password", "Password must contain at least 8 characters - 1 lowercase, 1 uppercase, 1 number and 1 symbol")
+    body("password", "Password must contain at least 8 characters - 1 lowercase, 1 uppercase, 1 number, 1 symbol")
         .trim()
         .isAscii()
         .isStrongPassword()
@@ -52,9 +52,7 @@ exports.user_signup_post = [
         try{
             // 0 - checking and catching form errors
             const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                // there are errors
-
+            if (!errors.isEmpty()) { //* there are errors *//
                 // rendering the same page again
                 res.render('signup_form', {
                     errors: errors.array(),
@@ -73,10 +71,13 @@ exports.user_signup_post = [
             const emailTxt = JSON.stringify(emailRaw);
             const email = JSON.parse(emailTxt);
 
+            // lowering email
+            const lowered_email = req.body.email.toLowerCase();
+        
             if (email.length > 0){ 
                 let count = 0;
                 do {
-                    if (req.body.email.toLowerCase() === email[count].user_email) {
+                    if (lowered_email === email[count].user_email) {
                         const errors = [{ msg: 'E-mail already in use!' }];
                         res.render('signup_form', {
                             errors: errors,
@@ -90,8 +91,8 @@ exports.user_signup_post = [
 
             // 2 - create user
             const userRaw = await User.create({
-                user_name: req.body.name.toLowerCase(), /* formating name */
-                user_email: req.body.email.toLowerCase(), /* formating email */
+                user_name: req.body.name.toLowerCase(), //* formating name *//
+                user_email: lowered_email, //* formating email *//
                 role_id: 2
             });
             const userTxt = JSON.stringify(userRaw);
@@ -99,7 +100,7 @@ exports.user_signup_post = [
 
             // 3 - create pwd
             await bcrypt.genSalt(async (err, salt) => {
-                await bcrypt.hash('password', salt, async (err, hash) => {
+                await bcrypt.hash(req.body.password, salt, async (err, hash) => {
                     await Password.create({
                         user_id: user.user_id,
                         user_salt: salt,
@@ -113,7 +114,6 @@ exports.user_signup_post = [
         } catch (err) {
             console.log(err);
         }
-
     }
 ]
 
@@ -125,21 +125,72 @@ exports.user_login_get = (req, res, next) => {
 
 exports.user_login_post = [
     // validate and sanitize
-    body("name", "Name must contain at least 3 characters")
-        .trim()
-        .isString()
-        .isLength({ min: 3 })
-        .escape(),
-
     body("email", "Invalid e-mail")
         .trim()
         .isAscii()
         .isEmail()
         .escape(),
 
-    body("password", "Password must contain at least 8 characters - 1 lowercase, 1 uppercase, 1 number and 1 symbol")
+    body("password", "Invalid password")
         .trim()
         .isAscii()
         .isStrongPassword()
         .escape(),
+    
+    // login logic
+    async (req, res) => {
+        try {
+            // 0 - checking and catching form errors
+            const errors = validationResult(req);
+
+            const lowered_email = req.body.email.toLowerCase(); //* lowering email *//
+
+            if(!errors.isEmpty()){
+                // there are errors
+                res.render('login_form', {
+                    title: 'Welcome to Local-Library',
+                    errors: errors.array(),
+                    email: lowered_email,
+                    password: req.body.password
+                });
+                return;
+            }
+
+            // 1 - checking and catching database errors
+            const user_data = await sequelize.query('SELECT user_password, user_salt, user.user_email, user.user_id ' +
+                                               'FROM password ' +
+                                               'LEFT JOIN user ' +
+                                               'ON password.user_id = user.user_id ' +
+                                               'WHERE user.user_email = ?', { replacements: [`${lowered_email}`], type: sequelize.QueryTypes.SELECT });
+            
+            if (user_data.length === 0) {
+                const errors = [{ msg: 'E-mail not registered!' }];
+                res.render('login_form', {
+                    errors: errors,
+                    title: 'Welcome to Local-Library',
+                    email: lowered_email,
+                    password: req.body.password
+                });
+                return;
+            }
+
+            const hashed_user_input = await bcrypt.hash(req.body.password, user_data[0].user_salt);
+
+            if (hashed_user_input === user_data[0].user_password) {
+                // 4 - render catalog
+                res.redirect('/catalog');
+            } else {
+                const errors = [{ msg: 'Incorrect password' }];
+                res.render('login_form', {
+                    errors: errors,
+                    title: 'Welcome to Local-Library',
+                    email: lowered_email,
+                    password: req.body.password
+                });
+                return;
+            }
+        } catch(err) {
+            console.log(err);
+        }
+    }
 ]
