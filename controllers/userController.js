@@ -6,6 +6,8 @@ const User = require('../models/user');
 const associations = require('../models/associations');
 const bcrypt= require('bcrypt');
 const sequelize = require('../db/dbConnection');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
@@ -14,6 +16,14 @@ const { body, validationResult } = require('express-validator');
 
 // Load Associations
 associations();
+
+// create jwt
+const maxAge = 3 * 24 * 60 * 60;
+const createToken = (id) => {
+    return jwt.sign({ id }, 'test', {
+        expiresIn: maxAge
+    });
+}
 
 // then exports functions for each of the URLs we wish to handle
 
@@ -109,7 +119,13 @@ exports.user_signup_post = [
                 });
             });
 
-            // 4 - render catalog
+            // 4 - create jwt
+            const token = createToken(user.user_id);
+
+            // 5 - attach jwt to a cookie
+            res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+
+            //  - render catalog
             res.redirect('/catalog');
         } catch (err) {
             console.log(err);
@@ -175,8 +191,14 @@ exports.user_login_post = [
             }
 
             const hashed_user_input = await bcrypt.hash(req.body.password, user_data[0].user_salt);
-
+            
             if (hashed_user_input === user_data[0].user_password) {
+                // 4 - create jwt
+                const token = createToken(user_data[0].user_id);
+
+                // 5 - attach jwt to a cookie
+                res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
+                
                 // 4 - render catalog
                 res.redirect('/catalog');
             } else {
