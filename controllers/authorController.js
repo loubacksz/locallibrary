@@ -3,9 +3,6 @@
 // first we need to import the modules - we'll later be using to access and update our data
 const Book = require('../models/book');
 const Author = require('../models/author');
-const GenreBook = require('../models/genrebook');
-const Genre = require('../models/genre');
-const BookInstance = require('../models/bookinstance');
 const associations = require('../models/associations');
 
 // importing validation and sanitization methods
