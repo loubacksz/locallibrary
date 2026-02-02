@@ -216,3 +216,8 @@ exports.user_login_post = [
         }
     }
 ]
+
+exports.user_logout_get = (req, res, next) => {
+    res.cookie('jwt', '',{ httpOnly: true, maxAge: 1, expires: 1 });
+    res.redirect('/users/login');
+}

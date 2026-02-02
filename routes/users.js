@@ -20,5 +20,10 @@ router.get('/login', user_controller.user_login_get);
 // POST users login page
 router.post('/login', user_controller.user_login_post);
 
+/// LOGOUT ROUTES ///
+
+// GET users logout page
+router.get('/logout', user_controller.user_logout_get);
+
 // this router object is used by the express app
 module.exports = router;
