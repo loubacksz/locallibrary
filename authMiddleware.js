@@ -16,7 +16,7 @@ const authFunction = (req, res, next) => {
     // check if the cookie exists
     if (token) {
         // verifying cookie
-        jwt.verify(token, 'test', (err, decodedToken) => {
+        jwt.verify(token, process.env.SECRET, (err, decodedToken) => {
             // verifying cookie error handler
             if (err) {
                 console.log(err.message + ' -----------------------------');
@@ -42,7 +42,7 @@ const checkUser = (req, res, next) => {
     // check if the cookie exists
     if (token) {
         // verifying cookie
-        jwt.verify(token, 'test', async (err, decodedToken) => {
+        jwt.verify(token, process.env.SECRET, async (err, decodedToken) => {
             // verifying cookie error handler
             if (err) {
                 console.log(err.message + ' -----------------------------');
