@@ -54,7 +54,9 @@ const checkUser = (req, res, next) => {
                         // so the code continues normally 
             } else {
                 // searching for user with jwt
-                let user = await User.findByPk(decodedToken.id);
+                let userRaw = await User.findByPk(decodedToken.id);
+                const userTxt = JSON.stringify(userRaw)
+                const user = JSON.parse(userTxt);
 
                 // using res.locals to send user info to the views
                 res.locals.exports = user;
