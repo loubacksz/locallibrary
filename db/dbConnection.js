@@ -5,6 +5,7 @@
 
 // const app = require('../app'); -> idk why, but this fucker was responsible for TypeError: database.define is not a function
 
+require('dotenv').config();
 // database packages
 const mysql = require('mysql');
 const { Sequelize } = require('sequelize');
@@ -13,8 +14,8 @@ const { Sequelize } = require('sequelize');
  * ORM setup
  */
 
-const sequelize = new Sequelize('locallibrary', 'root', 'V01d3m0rt', {
-    host: 'localhost',
+const sequelize = new Sequelize(process.env.DB, process.env.DB_USER, process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST,
     dialect: 'mysql'
 });
 
