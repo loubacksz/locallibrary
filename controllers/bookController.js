@@ -7,6 +7,7 @@ const GenreBook = require('../models/genrebook');
 const Genre = require('../models/genre');
 const BookInstance = require('../models/bookinstance');
 const associations = require('../models/associations');
+const { checkUserCredentials } = require('../public/javascripts/checkUserCredentials')
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
@@ -42,6 +43,7 @@ exports.index = async (req, res, next) => {
         book_instance_available_count: numAvailableBookInstances.count,
         author_count: numAuthors.count,
         genre_count: numGenres.count,
+        user_data: await checkUserCredentials(req, res)
     });
 };
 

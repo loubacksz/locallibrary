@@ -172,13 +172,16 @@ exports.user_login_post = [
                 return;
             }
 
-            // 1 - checking and catching database errors
-            const user_data = await sequelize.query('SELECT user_password, user_salt, user.user_email, user.user_id ' +
-                                               'FROM password ' +
-                                               'LEFT JOIN user ' +
-                                               'ON password.user_id = user.user_id ' +
-                                               'WHERE user.user_email = ?', { replacements: [`${lowered_email}`], type: sequelize.QueryTypes.SELECT });
+            // 1 - request user
+            const user_data = await sequelize.query('SELECT user_password, user_salt, user.user_email, user.user_id, role.role_name ' +
+                                                    'FROM password ' +
+                                                    'INNER JOIN user ' +
+                                                    'ON password.user_id = user.user_id ' +
+                                                    'INNER JOIN role ' +
+                                                    'ON user.role_id = role.role_id ' +
+                                                    'WHERE user.user_email = ? ', { replacements: [`${lowered_email}`], type: sequelize.QueryTypes.SELECT });
             
+            // 2 - checking user and database errors
             if (user_data.length === 0) {
                 const errors = [{ msg: 'E-mail not registered!' }];
                 res.render('login_form', {
@@ -190,8 +193,9 @@ exports.user_login_post = [
                 return;
             }
 
+            // 3 - hashing user pwd input    
             const hashed_user_input = await bcrypt.hash(req.body.password, user_data[0].user_salt);
-            
+            // 3.1 - comparing user pwd input with pwd in the database
             if (hashed_user_input === user_data[0].user_password) {
                 // 4 - create jwt
                 const token = createToken(user_data[0].user_id);
@@ -199,7 +203,7 @@ exports.user_login_post = [
                 // 5 - attach jwt to a cookie
                 res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
                 
-                // 4 - render catalog
+                // 6 - render index
                 res.redirect('/catalog');
             } else {
                 const errors = [{ msg: 'Incorrect password' }];
