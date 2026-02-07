@@ -30,7 +30,7 @@ const authFunction = (req, res, next) => {
     }
     // checking if the cookie exists error handler
     else {
-        res.redirect('/');
+        res.redirect('/users/login');
     }
 }
 

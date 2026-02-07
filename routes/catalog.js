@@ -36,7 +36,7 @@ router.post("/book/:id/update", authFunction, book_controller.book_update_post);
 router.get("/book/:id", book_controller.book_detail);
 
 // GET request for list of all Book items.
-router.get("/books", book_controller.book_list);
+router.get("/books", authFunction, book_controller.book_list);
 
 /// AUTHOR ROUTES ///
 
@@ -62,7 +62,7 @@ router.post("/author/:id/update", authFunction, author_controller.author_update_
 router.get("/author/:id", author_controller.author_detail);
 
 // GET request for list of all Authors.
-router.get("/authors", author_controller.author_list);
+router.get("/authors", authFunction, author_controller.author_list);
 
 /// GENRE ROUTES ///
 
@@ -88,7 +88,7 @@ router.post("/genre/:id/update", authFunction, genre_controller.genre_update_pos
 router.get("/genre/:id", genre_controller.genre_detail);
 
 // GET request for list of all Genre.
-router.get("/genres", genre_controller.genre_list);
+router.get("/genres", authFunction, genre_controller.genre_list);
 
 /// BOOKINSTANCE ROUTES ///
 
@@ -132,7 +132,7 @@ router.post(
 router.get("/bookinstance/:id", book_instance_controller.bookinstance_detail);
 
 // GET request for list of all BookInstance.
-router.get("/bookinstances", book_instance_controller.bookinstance_list);
+router.get("/bookinstances", authFunction, book_instance_controller.bookinstance_list);
 
 // this router object is used by the express app
 module.exports = router;
