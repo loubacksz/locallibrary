@@ -13,13 +13,20 @@ html(lang='en')
         div(class='col-sm-12')
           block header
             div(class='d-flex justify-content-end align-items-end')
-              ul(class='sidebar-nav list-inline mb-0')
-                li.list-inline-item
-                  a.btn.btn-primary(href='/users/logout') Logout
-                li.list-inline-item
-                  a.btn.btn-primary(href='/users/login') Login
-                li.list-inline-item
-                  a.btn.btn-primary(href='/users/signup') Signup
+              if user
+                ul(class='sidebar-nav list-inline mb-0')
+                  li.list-inline-item
+                    p Welcome, #{user.user_email} 
+                  li.list-inline-item
+                    a.btn.btn-primary(href='/users/logout') Logout
+              else
+                ul(class='sidebar-nav list-inline mb-0')
+                  li.list-inline-item
+                    p Welcome!
+                  li.list-inline-item
+                    a.btn.btn-primary(href='/users/login') Login
+                  li.list-inline-item
+                    a.btn.btn-primary(href='/users/signup') Signup
       div(class='row')
         div(class='col-sm-2')
           block sidebar
@@ -35,15 +42,17 @@ html(lang='en')
               li
                 a(href='/catalog/bookinstances') All book-instances
               li
-              if true === user_data
-                hr
-                li
-                  a(href='/catalog/author/create') Create new author
-                li
-                  a(href='/catalog/genre/create') Create new genre
-                li
-                  a(href='/catalog/book/create') Create new book
-                li
-                  a(href='/catalog/bookinstance/create') Create new book instance (copy)
+              if user
+                if user.role.role_name === 'admin'
+                  hr
+                  li
+                    a(href='/catalog/author/create') Create new author
+                  li
+                    a(href='/catalog/genre/create') Create new genre
+                  li
+                    a(href='/catalog/book/create') Create new book
+                  li
+                    a(href='/catalog/bookinstance/create') Create new book instance (copy)
+              else
         div(class='col-sm-10')
           block content
