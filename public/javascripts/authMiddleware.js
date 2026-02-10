@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../../models/user');
+const Role = require('../../models/role');
+const { parseDatabaseRequest } = require('./parseDatabaseRequest')
 
 /* 
   to access the cookies and user input and to call the controller functions 
@@ -48,18 +50,26 @@ const checkUser = (req, res, next) => {
                 console.log(err.message + ' -----------------------------');
 
                 // if there is a jwt error, the user is not logged, so set user to null
-                res.locals.exports = null;
+                res.locals.user = null;
 
                 next(); // the token is not valid, there is no user logged in
                         // so the code continues normally 
             } else {
                 // searching for user with jwt
-                let userRaw = await User.findByPk(decodedToken.id);
-                const userTxt = JSON.stringify(userRaw)
-                const user = JSON.parse(userTxt);
+                const userDataRaw = await User.findByPk(decodedToken.id, {
+                        include: {
+                            model: Role,
+                            attributes: ['role_name'],
+                        },
+                        attributes: {
+                            exclude: ['user_id', 'role_id']
+                        }
+                    });
+                    const userData = parseDatabaseRequest(userDataRaw);
 
                 // using res.locals to send user info to the views
-                res.locals.exports = user;
+                res.locals.user = userData;
+                console.log(userData)
                 next();
             }
         });
@@ -69,7 +79,7 @@ const checkUser = (req, res, next) => {
         // if there is no jwt, the user is not logged, 
         // so set user to null and call the next function in the stack
         console.log('no user logged -----------------');
-        res.locals.exports = null;
+        res.locals.user = null;
         next();
     }
 }
