@@ -3,11 +3,13 @@
 // first we need to import the modules - we'll later be using to access and update our data
 const Password = require('../models/password');
 const User = require('../models/user');
+const Role = require('../models/role');
 const associations = require('../models/associations');
 const bcrypt= require('bcrypt');
 const sequelize = require('../db/dbConnection');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const {parseDatabaseRequest} = require('../public/javascripts/parseDatabaseRequest')
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
@@ -74,18 +76,17 @@ exports.user_signup_post = [
                 return;
             }
 
+            // lowering email
+            const lowered_email = req.body.email.toLowerCase();
+
             // 1 - checking and catching database errors
             const emailRaw = await User.findAll({
                 attributes: ['user_email'],
                 where: {
-                    user_email: req.body.email
+                    user_email: lowered_email
                 }
             });
-            const emailTxt = JSON.stringify(emailRaw);
-            const email = JSON.parse(emailTxt);
-
-            // lowering email
-            const lowered_email = req.body.email.toLowerCase();
+            const email = parseDatabaseRequest(emailRaw);
         
             if (email.length > 0){ 
                 let count = 0;
@@ -93,8 +94,10 @@ exports.user_signup_post = [
                     if (lowered_email === email[count].user_email) {
                         const errors = [{ msg: 'E-mail already in use!' }];
                         res.render('signup_form', {
+                            title: "It's great to have you with us!",
                             errors: errors,
-                            title: "It's great to have you with us!"
+                            name: req.body.name,
+                            email: req.body.email
                         });
                         return;
                     }
@@ -108,8 +111,7 @@ exports.user_signup_post = [
                 user_email: lowered_email, //* formating email *//
                 role_id: 2
             });
-            const userTxt = JSON.stringify(userRaw);
-            const user = JSON.parse(userTxt);
+            const user = parseDatabaseRequest(userRaw);
 
             // 3 - create pwd
             await bcrypt.genSalt(async (err, salt) => {
@@ -169,39 +171,51 @@ exports.user_login_post = [
                 res.render('login_form', {
                     title: 'Welcome to Local-Library',
                     errors: errors.array(),
-                    email: lowered_email,
+                    email: req.body.email,
                     password: req.body.password
                 });
                 return;
             }
 
             // 1 - request user
-            const user_data = await sequelize.query('SELECT user_password, user_salt, user.user_email, user.user_id, role.role_name ' +
-                                                    'FROM password ' +
-                                                    'INNER JOIN user ' +
-                                                    'ON password.user_id = user.user_id ' +
-                                                    'INNER JOIN role ' +
-                                                    'ON user.role_id = role.role_id ' +
-                                                    'WHERE user.user_email = ? ', { replacements: [`${lowered_email}`], type: sequelize.QueryTypes.SELECT });
+            const userDataRaw = await User.findOne(
+                {
+                    attributes: ['user_email', 'user_id'],
+                    include: [
+                        {
+                            model: Password,
+                            attributes: ['user_password', 'user_salt'],
+                        },
+                        {
+                            model: Role,
+                            attributes: ['role_name'],
+                        }
+                    ],
+                    where: {
+                        user_email: lowered_email
+                    }
+                }
+            );
+            const userData = parseDatabaseRequest(userDataRaw)
             
             // 2 - checking user and database errors
-            if (user_data.length === 0) {
+            if (!userDataRaw) {
                 const errors = [{ msg: 'E-mail not registered!' }];
                 res.render('login_form', {
                     errors: errors,
                     title: 'Welcome to Local-Library',
-                    email: lowered_email,
+                    email: req.body.email,
                     password: req.body.password
                 });
                 return;
             }
 
             // 3 - hashing user pwd input    
-            const hashed_user_input = await bcrypt.hash(req.body.password, user_data[0].user_salt);
+            const hashedUserInput = await bcrypt.hash(req.body.password, userData.password.user_salt);
             // 3.1 - comparing user pwd input with pwd in the database
-            if (hashed_user_input === user_data[0].user_password) {
+            if (hashedUserInput === userData.password.user_password) {
                 // 4 - create jwt
-                const token = createToken(user_data[0].user_id);
+                const token = createToken(userData.user_id);
 
                 // 5 - attach jwt to a cookie
                 res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
@@ -213,7 +227,7 @@ exports.user_login_post = [
                 res.render('login_form', {
                     errors: errors,
                     title: 'Welcome to Local-Library',
-                    email: lowered_email,
+                    email: req.body.email,
                     password: req.body.password
                 });
                 return;
