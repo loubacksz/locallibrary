@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const database = require('../db/dbConnection');
+const { DateTime } = require("luxon");
 
 /* 
     database = sequelize variable from /db/dbConnection - it's the connection with the database
@@ -35,7 +36,27 @@ const Author = database.define('author', {
         }
     },
     date_of_birth: DataTypes.DATEONLY,
-    date_of_death: DataTypes.DATEONLY
+    date_of_death: DataTypes.DATEONLY,
+    birth_date_formatted: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if (this.date_of_birth !== null) {
+                return DateTime.fromISO(this.date_of_birth).toLocaleString(DateTime.DATE_MED);
+            } else {
+                return 'No birth date!';
+            }
+        }
+    },
+    death_date_formatted: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if (this.date_of_death !== null) {
+                return DateTime.fromISO(this.date_of_death).toLocaleString(DateTime.DATE_MED);
+            } else {
+                return 'No death date!';
+            }
+        }
+    },
 }, {
     timestamps: false,
     freezeTableName: true
