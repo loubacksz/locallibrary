@@ -15,13 +15,13 @@ html(lang='en')
             form(method='POST')
                 div.form-group.mb-3
                     label(for='name' class='form-label mb-1') Name:
-                    input#first_name.form-control(type='text', name='name' required)
+                    input#first_name.form-control(type='text', name='name' required value=(undefined===name ? '' : name))
                 div.form-group.mb-3
                     label(for='email' class='form-label mb-1') E-mail:
-                    input#first_name.form-control(type='email', name='email' required)
+                    input#first_name.form-control(type='email', name='email' required value=(undefined===email ? '' : email))
                 div.form-group.mb-4
                     label(for='password' class='form-label mb-1') Password:
-                    input#family_name.form-control(type='password', name='password' required)
+                    input#family_name.form-control(type='password', name='password' required value=(undefined===password ? '' : password))
                 button.btn.btn-primary(type='submit' class='w-100 mb-3') Submit
                 if errors
                     div(class='alert alert-danger mt-3')

@@ -11,6 +11,7 @@ require('dotenv').config();
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
+const { IGNORE } = require('sequelize/lib/index-hints');
 /* this is just a function call that returns an object, and we DESTRUCTURE the two properties, 'body' and 'validationResult', from the object, 
    so we can use them as variables directly */
 
@@ -42,7 +43,7 @@ exports.user_signup_post = [
 
     body("name", "Name must contain only letters")
         .trim()
-        .isAlpha()
+        .isAlpha('en-US', {ignore: " "})
         .escape(),
 
     body("email", "Invalid e-mail")
@@ -66,7 +67,9 @@ exports.user_signup_post = [
                 // rendering the same page again
                 res.render('signup_form', {
                     errors: errors.array(),
-                    title: "It's great to have you with us!"
+                    title: "It's great to have you with us!",
+                    name: req.body.name,
+                    email: req.body.email,
                 });
                 return;
             }
