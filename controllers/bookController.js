@@ -7,6 +7,7 @@ const GenreBook = require('../models/genrebook');
 const Genre = require('../models/genre');
 const BookInstance = require('../models/bookinstance');
 const associations = require('../models/associations');
+const { parseDatabaseRequest } = require('../public/javascripts/parseDatabaseRequest');
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
@@ -58,8 +59,7 @@ exports.book_list = async (req, res, next) => {
                 order: [['title', 'ASC']],
             }
         );
-        const string = JSON.stringify(allBooks, null, 2);
-        const book = JSON.parse(string);
+        const book = parseDatabaseRequest(allBooks);
 
         res.render("book_list", { title: "Book List", book_list: book });
     } catch (err) {
@@ -86,8 +86,7 @@ exports.book_detail = async (req, res, next) => {
             ],
             order: [['title', 'ASC']],
         });
-        const book_text = JSON.stringify(bookDetail);
-        const book = JSON.parse(book_text);
+        const book = parseDatabaseRequest(bookDetail);
 
         if (book === null) {
             const error = new Error('Book not found');
@@ -114,10 +113,8 @@ exports.book_create_get = async (req, res, next) => {
                 order: [['name', 'ASC']]
             }),
         ]);
-        const authorsTxt = JSON.stringify(allAuthorsRaw);
-        const allAuthors = JSON.parse(authorsTxt);
-        const genresTxt = JSON.stringify(allGenresRaw);
-        const allGenres = JSON.parse(genresTxt);
+        const allAuthors = parseDatabaseRequest(allAuthorsRaw);
+        const allGenres = parseDatabaseRequest(allGenresRaw);
 
         res.render("book_form", { title: "Create Book", authors: allAuthors, genres: allGenres });
     } catch (err) {
@@ -193,11 +190,8 @@ exports.book_create_post = [
                 Author.findAll({ order: [['first_name', 'ASC']] }),
                 Genre.findAll({ order: [['name', 'ASC']] })
             ]);
-            const authorsTxt = JSON.stringify(allAuthorsRaw);
-            const allAuthors = JSON.parse(authorsTxt);
-
-            const genresTxt = JSON.stringify(allGenresRaw);
-            const allGenres = JSON.parse(genresTxt);
+            const allAuthors = parseDatabaseRequest(allAuthorsRaw);
+            const allGenres = parseDatabaseRequest(allGenresRaw);
 
             // mark our selected genres as checked | here we're verifying if the genre array created above using the form is included on the Book object build above
             // if true - (i think)we create the 'checked' attribute and mark it as true | here we'll use the genrebook model / we do create the attribute
@@ -240,8 +234,7 @@ exports.book_delete_get = async (req, res, next) => {
             ],
             order: [['title', 'ASC']],
         });
-        const bookTxt = JSON.stringify(bookRaw);
-        const book = JSON.parse(bookTxt);
+        const book = parseDatabaseRequest(bookRaw);
 
         if (book === null) {
             res.redirect("/catalog/books");
@@ -276,8 +269,7 @@ exports.book_delete_post = async (req, res, next) => {
             ],
             order: [['title', 'ASC']],
         });
-        const bookTxt = JSON.stringify(bookRaw);
-        const book = JSON.parse(bookTxt);
+        const book = parseDatabaseRequest(bookRaw);
 
         if (bookRaw === null) {
             res.redirect("/catalog/books");
@@ -332,15 +324,9 @@ exports.book_update_get = async (req, res, next) => {
             }),
             await Book.findByPk(req.params.id, { include: [{ model: Genre, attributes: ['id'] }] })
         ]);
-
-        const authorsTxt = JSON.stringify(allAuthorsRaw);
-        const allAuthors = JSON.parse(authorsTxt);
-
-        const genresTxt = JSON.stringify(allGenresRaw);
-        const allGenres = JSON.parse(genresTxt);
-
-        const bookTxt = JSON.stringify(bookRaw);
-        const book = JSON.parse(bookTxt);
+        const allAuthors = parseDatabaseRequest(allAuthorsRaw);
+        const allGenres = parseDatabaseRequest(allGenresRaw);
+        const book = parseDatabaseRequest(bookRaw);
 
         if (bookRaw === null) {
             const error = new Error('Book not found');
@@ -404,12 +390,11 @@ exports.book_update_post = [
             req.body.genre = genresArray;
 
             // search for book and author
-            const [getBookRaw, authorRaw] = await Promise.all([
+            const [bookRaw, authorRaw] = await Promise.all([
                 Book.findByPk(req.params.id, { include: [{ model: Genre }, { model: Author }] }),
                 Author.findByPk(req.body.author)
             ])
-            const bookTxt = JSON.stringify(getBookRaw);
-            const book = JSON.parse(bookTxt);
+            const book = parseDatabaseRequest(bookRaw);
 
             await Book.update(
                 {
@@ -470,11 +455,8 @@ exports.book_update_post = [
                     Author.findAll({ order: [['first_name', 'ASC']] }),
                     Genre.findAll({ order: [['name', 'ASC']] })
                 ]);
-                const authorsTxt = JSON.stringify(allAuthorsRaw);
-                const allAuthors = JSON.parse(authorsTxt);
-
-                const genresTxt = JSON.stringify(allGenresRaw);
-                const allGenres = JSON.parse(genresTxt);
+                const allAuthors = parseDatabaseRequest(allAuthorsRaw);
+                const allGenres = parseDatabaseRequest(allGenresRaw);
 
                 // mark our selected genres as checked | here we're verifying if the genre array created above using the form is included on the Book object build above
                 // if true - (i think)we create the 'checked' attribute and mark it as true | we do create the attribute

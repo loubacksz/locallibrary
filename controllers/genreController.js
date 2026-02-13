@@ -4,6 +4,7 @@
 const Book = require('../models/book');
 const Genre = require('../models/genre');
 const associations = require('../models/associations');
+const { parseDatabaseRequest } = require('../public/javascripts/parseDatabaseRequest');
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
@@ -18,15 +19,14 @@ associations();
 // Display list of all Genre
 exports.genre_list = async (req, res, next) => {
     try {
-        const allGenres = await Genre.findAll({
+        const allGenresRaw = await Genre.findAll({
             order: [['name', 'ASC']]
         });
-        const text = JSON.stringify(allGenres);
-        const json = JSON.parse(text);
+        const allGenres = parseDatabaseRequest(allGenresRaw);
 
         res.render('genre_list', {
             title: "Genre List",
-            genre_list: json,
+            genre_list: allGenres,
         });
     } catch (err) {
         console.log('debbug: ' + err);
@@ -42,8 +42,7 @@ exports.genre_detail = async (req, res, next) => {
             },
             order: [['name', 'ASC'], [Book, 'title', 'ASC']]
         });
-        const genreTxt = JSON.stringify(genreRaw);
-        const genre = JSON.parse(genreTxt);
+        const genre = parseDatabaseRequest(genreRaw);
 
         if (genre === null) {
             const error = new Error('Genre not found');
@@ -127,8 +126,7 @@ exports.genre_delete_get = async (req, res, next) => {
             },
             order: [['name', 'ASC'], [Book, 'title', 'ASC']]
         });
-        const genreTxt = JSON.stringify(genreRaw);
-        const genre = JSON.parse(genreTxt);
+        const genre = parseDatabaseRequest(genreRaw);
 
         if (genreRaw === null) {
             res.redirect('/catalog/genres');
@@ -146,14 +144,13 @@ exports.genre_delete_get = async (req, res, next) => {
 // Handle Genre delete on POST
 exports.genre_delete_post = async (req, res, next) => {
     try {
-        const getGenreRaw = await Genre.findByPk(req.params.id, {
+        const genreRaw = await Genre.findByPk(req.params.id, {
             include: {
                 model: Book,
             },
             order: [['name', 'ASC'], [Book, 'title', 'ASC']]
         });
-        const genreTxt = JSON.stringify(getGenreRaw);
-        const genre = JSON.parse(genreTxt);
+        const genre = parseDatabaseRequest(genreRaw);
 
         if (genre === null) {
             res.redirect("/catalog/genres");
@@ -169,7 +166,7 @@ exports.genre_delete_post = async (req, res, next) => {
 
         const deleteGenre = await Genre.destroy({
             where: {
-                id: req.params.id
+                id: genre.id
             }
         });
 
@@ -188,9 +185,8 @@ exports.genre_delete_post = async (req, res, next) => {
 // Display Genre update form on GET
 exports.genre_update_get = async (req, res, next) => {
     try {
-        const getGenreRaw = await Genre.findByPk(req.params.id);
-        const genreTxt = JSON.stringify(getGenreRaw);
-        const genre = JSON.parse(genreTxt);
+        const genreRaw = await Genre.findByPk(req.params.id);
+        const genre = parseDatabaseRequest(genreRaw);
 
         res.render("genre_form", { title: "Update Genre", genre: genre });
     } catch (err) {
@@ -207,7 +203,7 @@ exports.genre_update_post = [
         .escape(),
 
     body("name", "Genre name must use letters")
-        .isAlpha(),
+        .isAlpha('en-US', {ignore: " "}),
 
     // Process request after validation and sanitization
     async (req, res, next) => {
@@ -215,14 +211,13 @@ exports.genre_update_post = [
         const errors = validationResult(req);
 
         // Finding Genre
-        const getGenreRaw = await Genre.findByPk(req.params.id);
-        const genreTxt = JSON.stringify(getGenreRaw);
-        const genre = JSON.parse(genreTxt);
+        const genreRaw = await Genre.findByPk(req.params.id);
+        const genre = parseDatabaseRequest(genreRaw);
 
         // Check if Genre with same name already exists
         const genreExists = await Genre.findOne({
             where: {
-                name: req.body.name
+                name: genre.id
             }
         }); // I'm not worring about case-sensitivity here because mysql is defined to be accent-insensitive and case-insensitive
 
@@ -246,7 +241,7 @@ exports.genre_update_post = [
         await Genre.update({
             name: req.body.name,
         },
-            { where: { id: req.params.id } }
+            { where: { id: genre.id } }
         );
 
         res.redirect(genre.url);

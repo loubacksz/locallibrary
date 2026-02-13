@@ -9,7 +9,7 @@ const bcrypt= require('bcrypt');
 const sequelize = require('../db/dbConnection');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const {parseDatabaseRequest} = require('../public/javascripts/parseDatabaseRequest')
+const { parseDatabaseRequest } = require('../public/javascripts/parseDatabaseRequest');
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');

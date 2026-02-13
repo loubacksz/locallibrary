@@ -4,6 +4,7 @@
 const Book = require('../models/book');
 const Author = require('../models/author');
 const associations = require('../models/associations');
+const { parseDatabaseRequest } = require('../public/javascripts/parseDatabaseRequest');
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
@@ -32,7 +33,7 @@ exports.author_list = async (req, res, next) => {
 // Display detail page for a specific Author.
 exports.author_detail = async (req, res, next) => {
     try {
-        const authorDetail = await Author.findByPk(req.params.id, {
+        const authorDetailRaw = await Author.findByPk(req.params.id, {
             include: [
                 {
                     model: Book,
@@ -40,8 +41,7 @@ exports.author_detail = async (req, res, next) => {
             ],
             order: [['first_name', 'ASC']],
         });
-        const txt = JSON.stringify(authorDetail);
-        const author = JSON.parse(txt);
+        const author = parseDatabaseRequest(authorDetailRaw);
 
         if (author === null) {
             const error = new Error('Author not found');
@@ -137,8 +137,7 @@ exports.author_delete_get = async (req, res, next) => {
             ],
             order: [['first_name', 'ASC']],
         });
-        const authorTxt = JSON.stringify(authorRaw);
-        const author = JSON.parse(authorTxt);
+        const author = parseDatabaseRequest(authorRaw);
 
         if (author === null) {
             res.redirect('/catalog/authors');
@@ -168,8 +167,7 @@ exports.author_delete_post = async (req, res, next) => {
             ],
             order: [['first_name', 'ASC']],
         });
-        const authorTxt = JSON.stringify(authorRaw);
-        const author = JSON.parse(authorTxt);
+        const author = parseDatabaseRequest(authorRaw);
 
         if (author.books.length > 0) {
             res.render("author_delete", {
@@ -182,7 +180,7 @@ exports.author_delete_post = async (req, res, next) => {
 
         const destroy = await Author.destroy({
             where: {
-                id: req.params.id
+                id: author.id
             }
         });
 
@@ -202,8 +200,7 @@ exports.author_delete_post = async (req, res, next) => {
 exports.author_update_get = async (req, res, next) => {
     try {
         const authorRaw = await Author.findByPk(req.params.id);
-        const authorTxt = JSON.stringify(authorRaw);
-        const author = JSON.parse(authorTxt);
+        const author = parseDatabaseRequest(authorRaw);
 
         res.render('author_form', {
             title: "Update Author",
@@ -262,9 +259,7 @@ exports.author_update_post = [
             }
 
             const authorRaw = await Author.findByPk(req.params.id);
-            const authorTxt = JSON.stringify(authorRaw);
-            const author = JSON.parse(authorTxt);
-
+            const author = parseDatabaseRequest(authorRaw);
             Author.update({
                 first_name: req.body.first_name,
                 family_name: req.body.family_name,
@@ -273,7 +268,7 @@ exports.author_update_post = [
             },
                 {
                     where: {
-                        id: req.params.id
+                        id: author.id
                     }
                 }
             );

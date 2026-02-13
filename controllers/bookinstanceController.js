@@ -4,6 +4,7 @@
 const Book = require('../models/book');
 const BookInstance = require('../models/bookinstance');
 const associations = require('../models/associations');
+const { parseDatabaseRequest } = require('../public/javascripts/parseDatabaseRequest');
 
 // importing validation and sanitization methods
 const { body, validationResult } = require('express-validator');
@@ -18,7 +19,7 @@ associations();
 // Display list of all BookInstances.
 exports.bookinstance_list = async (req, res, next) => {
     try {
-        const allBookInstances = await BookInstance.findAll({
+        const allBookInstancesRaw = await BookInstance.findAll({
             include: {
                 model: Book,
                 attributes: ['title'],
@@ -28,13 +29,12 @@ exports.bookinstance_list = async (req, res, next) => {
             },
             order: [[Book, 'title', 'ASC']]
         });
-        let string = JSON.stringify(allBookInstances);
-        let json = JSON.parse(string);
+        const allBookInstances = parseDatabaseRequest(allBookInstancesRaw);
 
         res.render(
             "bookinstance_list", {
             title: "Book Instance List",
-            bookinstance_list: json,
+            bookinstance_list: allBookInstances,
         });
     } catch (err) {
         console.log('debbug: ' + err);
@@ -51,8 +51,7 @@ exports.bookinstance_detail = async (req, res, next) => {
             },
             attributes: { exclude: ['bookId'] },
         });
-        const text = JSON.stringify(bookInstanceDetail);
-        const bookinstance = JSON.parse(text);
+        const bookinstance = parseDatabaseRequest(bookInstanceDetail);
 
         if (bookinstance === null) {
             const error = new Error('Book Instance not found!');
@@ -73,8 +72,7 @@ exports.bookinstance_create_get = async (req, res, next) => {
     try {
         // Get all authors and genres, which we can use for adding to our book.
         const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
-        const bookTxt = JSON.stringify(allBooksRaw);
-        const allBooks = JSON.parse(bookTxt);
+        const allBooks = parseDatabaseRequest(allBooksRaw);
 
         res.render("bookinstance_form", { title: "Create Book Instance", book_list: allBooks });
     } catch (err) {
@@ -113,8 +111,7 @@ exports.bookinstance_create_post = [
             if (!errors.isEmpty()) {
                 // i can make this a function
                 const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
-                const bookTxt = JSON.stringify(allBooksRaw);
-                const allBooks = JSON.parse(bookTxt);
+                const allBooks = parseDatabaseRequest(allBooksRaw);
 
                 res.render('bookinstance_form', {
                     title: 'Create Book Instance',
@@ -144,8 +141,7 @@ exports.bookinstance_delete_get = async (req, res, next) => {
                 model: Book
             }
         });
-        const bookinstanceTxt = JSON.stringify(bookinstanceRaw);
-        const bookinstance = JSON.parse(bookinstanceTxt);
+        const bookinstance = parseDatabaseRequest(bookinstanceRaw);
 
         if (bookinstanceRaw === null) {
             res.redirect("/catalog/bookinstances");
@@ -171,13 +167,12 @@ exports.bookinstance_delete_post = async (req, res, next) => {
 
         if (bookinstanceRaw === 0) {
             // no rows delelte in the database
-            const getbookinstanceRaw = await BookInstance.findByPk(req.params.id, {
+            const bookinstanceRaw = await BookInstance.findByPk(req.params.id, {
                 include: {
                     model: Book
                 }
             });
-            const bookinstanceTxt = JSON.stringify(getbookinstanceRaw);
-            const bookinstance = JSON.parse(bookinstanceTxt);
+            const bookinstance = parseDatabaseRequest(bookinstanceRaw);
 
             res.render("bookinstance_delete", {
                 title: "Delete Bookinstance",
@@ -195,7 +190,7 @@ exports.bookinstance_delete_post = async (req, res, next) => {
 // Display BookInstance update form on GET.
 exports.bookinstance_update_get = async (req, res, next) => {
     try {
-        const [bookInstanceRaw, bookRaw] = await Promise.all([
+        const [bookinstanceRaw, bookRaw] = await Promise.all([
             BookInstance.findByPk(req.params.id, {
                 include: {
                     model: Book,
@@ -205,8 +200,7 @@ exports.bookinstance_update_get = async (req, res, next) => {
             }),
             Book.findAll({ order: [['title', 'ASC']] })
         ]);
-        const bookinstanceTxt = JSON.stringify(bookInstanceRaw);
-        const bookinstance = JSON.parse(bookinstanceTxt);
+        const bookinstance = parseDatabaseRequest(bookinstanceRaw);
 
         res.render("bookinstance_form", {
             title: "Update Book Instance",
@@ -243,8 +237,7 @@ exports.bookinstance_update_post = [
             if (!errors.isEmpty()) {
                 // i can make this a function
                 const allBooksRaw = await Book.findAll({ order: [['title', 'ASC']] });
-                const bookTxt = JSON.stringify(allBooksRaw);
-                const allBooks = JSON.parse(bookTxt);
+                const allBooks = parseDatabaseRequest(allBooksRaw);
 
                 res.render('bookinstance_form', {
                     title: 'Create Book Instance',
@@ -260,9 +253,8 @@ exports.bookinstance_update_post = [
                 req.body.due_back = null;
             }
 
-            const getbookinstanceRaw = await BookInstance.findByPk(req.params.id);
-            const bookinstanceTxt = JSON.stringify(getbookinstanceRaw);
-            const bookinstance = JSON.parse(bookinstanceTxt);
+            const bookinstanceRaw = await BookInstance.findByPk(req.params.id);
+            const bookinstance = parseDatabaseRequest(bookinstanceRaw);
 
             await BookInstance.update({
                 imprint: req.body.imprint,
@@ -270,7 +262,7 @@ exports.bookinstance_update_post = [
                 dueBack: req.body.due_back,
                 bookId: req.body.book
             },
-                { where: { id: req.params.id } }
+                { where: { id: bookinstance.id } }
             );
 
             res.redirect(bookinstance.url);
