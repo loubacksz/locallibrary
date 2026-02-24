@@ -85,3 +85,8 @@ const checkUser = (req, res, next) => {
 }
 
 module.exports = { authFunction, checkUser };
+
+// Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client 
+// -> I think this error occurs because I already rendered the index after the login post request, wich automatically calls a get request because it redirects to /catalog
+// and in the /catalog there is another call for redirect() here on this function
+// there was no need for redirecting again since this same page was already rendered - that was the problem

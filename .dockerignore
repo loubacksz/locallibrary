@@ -1,0 +1,6 @@
+# .dockerignore
+
+# do NOT pass env vars to image 
+.env
+node_modules
+Dockerfile
